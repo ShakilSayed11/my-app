@@ -1,25 +1,26 @@
 const express = require('express');
-const mongoose = require('mongoose');
-const dotenv = require('dotenv');
+const { MongoClient, ServerApiVersion } = require('mongodb');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
+require('dotenv').config();
 
-dotenv.config();
+const uri = process.env.MONGO_URI;
+const client = new MongoClient(uri, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  }
+});
 
 const app = express();
-
-// Middleware
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(session({ secret: 'yourSecretKey', resave: false, saveUninitialized: false }));
 app.use(passport.initialize());
 app.use(passport.session());
 
-// MongoDB Connection
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
-
-// Passport Configuration
 passport.use(new LocalStrategy((username, password, done) => {
   // Implement user authentication here
 }));
@@ -34,9 +35,24 @@ passport.deserializeUser((id, done) => {
 
 // Routes
 app.get('/', (req, res) => {
-  res.render('index.ejs');
+  res.sendFile(__dirname + '/index.html');
 });
 
-app.listen(3000, () => {
-  console.log('Server started on http://localhost:3000');
-});
+async function run() {
+  try {
+    // Connect the client to the server (optional starting in v4.7)
+    await client.connect();
+    // Send a ping to confirm a successful connection
+    await client.db("admin").command({ ping: 1 });
+    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+
+    // Start the Express server after a successful connection to MongoDB
+    app.listen(3000, () => {
+      console.log('Server started on http://localhost:3000');
+    });
+
+  } catch (err) {
+    console.error(err);
+  }
+}
+run().catch(console.dir);
