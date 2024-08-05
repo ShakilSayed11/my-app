@@ -6,14 +6,10 @@ const { createClient } = require('@supabase/supabase-js');
 const ejs = require('ejs');
 const path = require('path');
 const bodyParser = require('body-parser');
-const bcrypt = require('bcryptjs');
 const app = express();
 
 // Initialize Supabase
-const supabase = createClient(
-  'https://dwcbvbpwkfmydeucsydj.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3Y2J2YnB3a2ZteWRldWNzeWRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjI4NTQ2NTMsImV4cCI6MjAzODQzMDY1M30.g688zmPnGmwu9oBt7YrfUmtivDohDyiEYPQP-lz16GI'
-);
+const supabase = createClient('https://dwcbvbpwkfmydeucsydj.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3Y2J2YnB3a2ZteWRldWNzeWRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjI4NTQ2NTMsImV4cCI6MjAzODQzMDY1M30.g688zmPnGmwu9oBt7YrfUmtivDohDyiEYPQP-lz16GI');
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -52,23 +48,22 @@ app.post('/login', async (req, res) => {
     .eq('username', username)
     .single();
 
-  if (error || !data || !(await bcrypt.compare(password, data.password))) {
-    return res.status(401).send('Invalid credentials');
+  if (error || !data || data.password !== password) {
+    return res.status(401).json({ message: 'Invalid credentials' }); // Return JSON
   }
 
   // Store user session
   req.session.isLoggedIn = true;
   req.session.username = username;
-  req.session.isAdmin = data.role === 'admin';
 
-  res.redirect('/');
+  res.json({ message: 'Login successful' }); // Return JSON
 });
 
 // Logout Route
 app.get('/logout', (req, res) => {
   req.session.destroy(err => {
     if (err) {
-      return res.status(500).send('Failed to log out');
+      return res.status(500).json({ message: 'Failed to log out' }); // Return JSON
     }
     res.redirect('/login');
   });
@@ -111,7 +106,7 @@ app.get('/inform-outage', (req, res) => {
 // Admin Page Route
 app.get('/admin', (req, res) => {
   if (req.session.isLoggedIn && req.session.isAdmin) {
-    res.render('admin-users'); // Render admin page
+    res.render('admin'); // Render admin page
   } else {
     res.redirect('/login');
   }
@@ -120,24 +115,16 @@ app.get('/admin', (req, res) => {
 app.post('/admin/add-user', async (req, res) => {
   const { username, password, role } = req.body;
 
-  try {
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
+  // Insert new user into Supabase
+  const { error } = await supabase
+    .from('users')
+    .insert([{ username, password, role }]);
 
-    // Insert new user into Supabase
-    const { error } = await supabase
-      .from('users')
-      .insert([{ username, password: hashedPassword, role }]);
-
-    if (error) {
-      throw error;
-    }
-
-    res.json({ message: 'User created successfully' });
-  } catch (error) {
-    console.error('Error creating user:', error);
-    res.status(500).json({ message: 'Failed to create user' });
+  if (error) {
+    return res.status(500).json({ message: 'Failed to add user' }); // Return JSON
   }
+
+  res.json({ message: 'User added successfully' }); // Return JSON
 });
 
 // Start server
