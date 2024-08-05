@@ -59,6 +59,8 @@ app.post('/login', async (req, res) => {
 
   const match = await bcrypt.compare(password, data.password);
 
+  console.log(`Password match: ${match}`);
+
   if (!match) {
     console.log('Invalid credentials');
     return res.status(401).json({ message: 'Invalid credentials' });
@@ -67,6 +69,7 @@ app.post('/login', async (req, res) => {
   // Store user session
   req.session.isLoggedIn = true;
   req.session.username = username;
+  req.session.isAdmin = data.role === 'admin';
 
   console.log('Login successful');
   res.redirect('/');
