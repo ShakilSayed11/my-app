@@ -7,32 +7,39 @@
 </head>
 <body>
     <h1>Admin - Manage Users</h1>
-    <form action="/admin/users/create" method="post">
+    <form id="createUserForm">
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" required>
         <br>
         <label for="password">Password:</label>
         <input type="password" id="password" name="password" required>
         <br>
+        <label for="role">Role:</label>
+        <select id="role" name="role">
+            <option value="admin">Admin</option>
+            <option value="user">User</option>
+        </select>
+        <br>
         <button type="submit">Create User</button>
     </form>
-
-    <h2>Existing Users</h2>
-    <ul id="userList"></ul>
-
     <script>
-        async function loadUsers() {
-            const response = await fetch('/admin/users/list');
-            const users = await response.json();
-            const userList = document.getElementById('userList');
-            users.forEach(user => {
-                const li = document.createElement('li');
-                li.textContent = user.username;
-                userList.appendChild(li);
-            });
-        }
+        document.getElementById('createUserForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const role = document.getElementById('role').value;
 
-        loadUsers();
+            const response = await fetch('/admin/users', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password, role }),
+            });
+
+            const result = await response.json();
+            alert(result.message);
+        });
     </script>
 </body>
 </html>
