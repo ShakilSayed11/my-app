@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const session = require('express-session');
+const MongoStore = require('connect-mongo'); // Import connect-mongo
 const MongoClient = require('mongodb').MongoClient;
 const dotenv = require('dotenv');
 
@@ -17,10 +18,7 @@ app.use(session({
   secret: 'secret',
   resave: false,
   saveUninitialized: true,
-  // Use a more production-ready session store in production
-  store: new (require('connect-mongo')(session))({
-    url: uri
-  })
+  store: MongoStore.create({ mongoUrl: uri }) // Use MongoStore
 }));
 
 // Connect to MongoDB
