@@ -11,6 +11,11 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY
 // Middleware to parse JSON requests
 app.use(express.json());
 
+// Root route
+app.get('/', (req, res) => {
+  res.send('Welcome to the Productivity App!');
+});
+
 // Sample route for connecting to Supabase and fetching data
 app.get('/test', async (req, res) => {
   try {
