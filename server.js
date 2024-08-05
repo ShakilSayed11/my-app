@@ -1,64 +1,134 @@
 const express = require('express');
-const app = express();
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
+const cors = require('cors');
+const { createClient } = require('@supabase/supabase-js');
+const ejs = require('ejs');
 const path = require('path');
 const bodyParser = require('body-parser');
-const session = require('express-session');
-const { MongoClient } = require('mongodb');
+const app = express();
 
-const PORT = process.env.PORT || 3000;
+// Initialize Supabase
+const supabase = createClient('YOUR_SUPABASE_URL', 'YOUR_SUPABASE_KEY');
 
-// MongoDB setup
-const uri = process.env.SUPABASE_DB_URL;
-const client = new MongoClient(uri);
-
-// Middleware setup
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(express.static(path.join(__dirname, 'public')));
+// Middleware
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(cookieParser());
+app.use(cors());
 app.use(session({
   secret: 'your-secret-key',
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false,
 }));
 
-// Middleware to check authentication
-function isAuthenticated(req, res, next) {
-  if (req.session.user) {
-    return next();
-  }
-  res.redirect('/login');
-}
+// Set view engine
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 
-// Route to serve login page
+// Serve static files
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Login Route
 app.get('/login', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'login.html'));
+  if (req.session.isLoggedIn) {
+    res.redirect('/');
+  } else {
+    res.render('login'); // Render login page
+  }
 });
 
-// Route to serve admin page
-app.get('/admin', isAuthenticated, (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'admin.html'));
-});
-
-// Route to serve main content
-app.get('/', isAuthenticated, (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'index.html'));
-});
-
-// Handle login form submission
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
-  // Check credentials
-  const db = client.db('app');
-  const users = db.collection('users');
-  const user = await users.findOne({ username, password });
-  if (user) {
-    req.session.user = user;
-    res.redirect('/');
+
+  // Query Supabase to verify user credentials
+  const { data, error } = await supabase
+    .from('users')
+    .select('*')
+    .eq('username', username)
+    .single();
+
+  if (error || !data || data.password !== password) {
+    return res.status(401).send('Invalid credentials');
+  }
+
+  // Store user session
+  req.session.isLoggedIn = true;
+  req.session.username = username;
+
+  res.redirect('/');
+});
+
+// Logout Route
+app.get('/logout', (req, res) => {
+  req.session.destroy(err => {
+    if (err) {
+      return res.status(500).send('Failed to log out');
+    }
+    res.redirect('/login');
+  });
+});
+
+// Main Page Route
+app.get('/', (req, res) => {
+  if (req.session.isLoggedIn) {
+    res.render('index'); // Render the main page with navigation
+  } else {
+    res.redirect('/login'); // Redirect to login page if not authenticated
+  }
+});
+
+// Handle other routes
+app.get('/productivity-form', (req, res) => {
+  if (req.session.isLoggedIn) {
+    res.render('productivity-form'); // Render productivity form page
   } else {
     res.redirect('/login');
   }
 });
 
+app.get('/tag-my-breaks', (req, res) => {
+  if (req.session.isLoggedIn) {
+    res.render('tag-my-breaks'); // Render tag my breaks page
+  } else {
+    res.redirect('/login');
+  }
+});
+
+app.get('/inform-outage', (req, res) => {
+  if (req.session.isLoggedIn) {
+    res.render('inform-outage'); // Render inform outage page
+  } else {
+    res.redirect('/login');
+  }
+});
+
+// Admin Page Route
+app.get('/admin', (req, res) => {
+  if (req.session.isLoggedIn && req.session.isAdmin) {
+    res.render('admin'); // Render admin page
+  } else {
+    res.redirect('/login');
+  }
+});
+
+app.post('/admin/add-user', async (req, res) => {
+  const { username, password } = req.body;
+
+  // Insert new user into Supabase
+  const { error } = await supabase
+    .from('users')
+    .insert([{ username, password }]);
+
+  if (error) {
+    return res.status(500).send('Failed to add user');
+  }
+
+  res.redirect('/admin');
+});
+
 // Start server
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
