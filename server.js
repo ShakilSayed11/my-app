@@ -1,39 +1,50 @@
 const express = require('express');
-const { createClient } = require('@supabase/supabase-js');
-require('dotenv').config();
-
 const app = express();
-const port = process.env.PORT || 3000;
+const { createClient } = require('@supabase/supabase-js');
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
-// Initialize Supabase client
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+const supabaseUrl = 'https://your-project.supabase.co';
+const supabaseKey = 'your-supabase-key';
+const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Middleware to parse JSON requests
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Root route
-app.get('/', (req, res) => {
-  res.send('Welcome to the Productivity App!');
+// Route to render the admin user management page
+app.get('/admin/users', (req, res) => {
+  res.sendFile(__dirname + '/views/admin-users.html');
 });
 
-// Sample route for connecting to Supabase and fetching data
-app.get('/test', async (req, res) => {
-  try {
+// Route to create a new user
+app.post('/admin/users/create', async (req, res) => {
+  const { username, password } = req.body;
+  if (username && password) {
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
     const { data, error } = await supabase
-      .from('your-table') // Replace with your table name
-      .select('*');
+      .from('users')
+      .insert([{ username, password: hashedPassword }]);
 
     if (error) {
-      throw error;
+      return res.status(500).json({ error: error.message });
     }
-
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.redirect('/admin/users');
+  } else {
+    res.status(400).send('Username and password are required.');
   }
 });
 
-// Start the server
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+// Route to list all users (for admin)
+app.get('/admin/users/list', async (req, res) => {
+  const { data, error } = await supabase
+    .from('users')
+    .select('*');
+  if (error) {
+    return res.status(500).json({ error: error.message });
+  }
+  res.json(data);
 });
+
+// Other routes...
+
+app.listen(3000, () => console.log('Server running on port 3000'));
