@@ -49,21 +49,21 @@ app.post('/login', async (req, res) => {
     .single();
 
   if (error || !data || data.password !== password) {
-    return res.status(401).json({ message: 'Invalid credentials' }); // Return JSON
+    return res.status(401).json({ message: 'Invalid credentials' });
   }
 
   // Store user session
   req.session.isLoggedIn = true;
   req.session.username = username;
 
-  res.json({ message: 'Login successful' }); // Return JSON
+  res.redirect('/');
 });
 
 // Logout Route
 app.get('/logout', (req, res) => {
   req.session.destroy(err => {
     if (err) {
-      return res.status(500).json({ message: 'Failed to log out' }); // Return JSON
+      return res.status(500).send('Failed to log out');
     }
     res.redirect('/login');
   });
@@ -113,18 +113,18 @@ app.get('/admin', (req, res) => {
 });
 
 app.post('/admin/add-user', async (req, res) => {
-  const { username, password, role } = req.body;
+  const { username, password } = req.body;
 
   // Insert new user into Supabase
   const { error } = await supabase
     .from('users')
-    .insert([{ username, password, role }]);
+    .insert([{ username, password }]);
 
   if (error) {
-    return res.status(500).json({ message: 'Failed to add user' }); // Return JSON
+    return res.status(500).send('Failed to add user');
   }
 
-  res.json({ message: 'User added successfully' }); // Return JSON
+  res.redirect('/admin');
 });
 
 // Start server
