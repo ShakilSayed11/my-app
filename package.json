@@ -19,4 +19,8 @@
   "engines": {
     "node": "20.x"
   }
+},
+"scripts": {
+  "create-admin": "node createAdminUserRunner.js",
+  "start": "node server.js"
 }
