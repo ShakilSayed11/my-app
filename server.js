@@ -1,58 +1,46 @@
 const express = require('express');
-const { MongoClient, ServerApiVersion } = require('mongodb');
 const bodyParser = require('body-parser');
 const session = require('express-session');
-const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
-require('dotenv').config();
+const MongoClient = require('mongodb').MongoClient;
+const dotenv = require('dotenv');
 
-const uri = process.env.MONGO_URI;
-const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  }
-});
+// Load environment variables from .env file
+dotenv.config();
 
 const app = express();
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(session({ secret: 'yourSecretKey', resave: false, saveUninitialized: false }));
-app.use(passport.initialize());
-app.use(passport.session());
+const port = process.env.PORT || 3000;
+const uri = process.env.MONGO_URI; // Use environment variable
 
-passport.use(new LocalStrategy((username, password, done) => {
-  // Implement user authentication here
+// Middleware
+app.use(bodyParser.json());
+app.use(session({
+  secret: 'secret',
+  resave: false,
+  saveUninitialized: true,
+  // Use a more production-ready session store in production
+  store: new (require('connect-mongo')(session))({
+    url: uri
+  })
 }));
 
-passport.serializeUser((user, done) => {
-  done(null, user.id);
-});
-
-passport.deserializeUser((id, done) => {
-  // Implement user deserialization here
-});
-
-// Routes
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
-});
-
-async function run() {
+// Connect to MongoDB
+async function connectToMongoDB() {
+  const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
   try {
-    // Connect the client to the server (optional starting in v4.7)
     await client.connect();
-    // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
-
-    // Start the Express server after a successful connection to MongoDB
-    app.listen(3000, () => {
-      console.log('Server started on http://localhost:3000');
-    });
-
-  } catch (err) {
-    console.error(err);
+    console.log("Connected to MongoDB");
+    return client;
+  } catch (error) {
+    console.error("Failed to connect to MongoDB", error);
+    process.exit(1); // Exit the process with an error code
   }
 }
-run().catch(console.dir);
+
+connectToMongoDB().then(client => {
+  // Define routes and other app logic here
+
+  // Start the server
+  app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`);
+  });
+});
