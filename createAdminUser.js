@@ -6,13 +6,12 @@ const supabase = createClient('https://dwcbvbpwkfmydeucsydj.supabase.co', 'eyJhb
 
 async function createAdminUser() {
   const username = 'admin_username'; // Change to the desired admin username
-  const email = 'admin_email@example.com'; // Change to the admin email
   const password = 'admin_password'; // Change to the desired admin password
   const hashedPassword = await bcrypt.hash(password, 10);
 
   const { error } = await supabase
     .from('users')
-    .insert([{ username, email, password: hashedPassword, role: 'admin' }]);
+    .insert([{ username, password: hashedPassword, role: 'admin' }]);
 
   if (error) {
     console.error('Error creating admin user:', error);
