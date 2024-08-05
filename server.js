@@ -6,10 +6,11 @@ const { createClient } = require('@supabase/supabase-js');
 const ejs = require('ejs');
 const path = require('path');
 const bodyParser = require('body-parser');
+const bcrypt = require('bcrypt');
 const app = express();
 
 // Initialize Supabase
-const supabase = createClient('https://dwcbvbpwkfmydeucsydj.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3Y2J2YnB3a2ZteWRldWNzeWRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjI4NTQ2NTMsImV4cCI6MjAzODQzMDY1M30.g688zmPnGmwu9oBt7YrfUmtivDohDyiEYPQP-lz16GI');
+const supabase = createClient('https://dwcbvbpwkfmydeucsydj.supabase.co', 'YOUR_SUPABASE_KEY');
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -17,7 +18,7 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(cors());
 app.use(session({
-  secret: 'asd48asd4a65',  // Use a strong secret key
+  secret: 'your-secret-key',
   resave: false,
   saveUninitialized: false,
 }));
@@ -40,6 +41,7 @@ app.get('/login', (req, res) => {
 
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
+  console.log(`Login attempt with username: ${username}`);
 
   // Query Supabase to verify user credentials
   const { data, error } = await supabase
@@ -48,7 +50,17 @@ app.post('/login', async (req, res) => {
     .eq('username', username)
     .single();
 
-  if (error || !data || data.password !== password) {
+  console.log('Supabase response:', { data, error });
+
+  if (error || !data) {
+    console.log('Invalid credentials');
+    return res.status(401).json({ message: 'Invalid credentials' });
+  }
+
+  const match = await bcrypt.compare(password, data.password);
+
+  if (!match) {
+    console.log('Invalid credentials');
     return res.status(401).json({ message: 'Invalid credentials' });
   }
 
@@ -56,6 +68,7 @@ app.post('/login', async (req, res) => {
   req.session.isLoggedIn = true;
   req.session.username = username;
 
+  console.log('Login successful');
   res.redirect('/');
 });
 
@@ -115,10 +128,13 @@ app.get('/admin', (req, res) => {
 app.post('/admin/add-user', async (req, res) => {
   const { username, password } = req.body;
 
+  // Hash the password before storing it in Supabase
+  const hashedPassword = await bcrypt.hash(password, 10);
+
   // Insert new user into Supabase
   const { error } = await supabase
     .from('users')
-    .insert([{ username, password }]);
+    .insert([{ username, password: hashedPassword }]);
 
   if (error) {
     return res.status(500).send('Failed to add user');
@@ -128,7 +144,7 @@ app.post('/admin/add-user', async (req, res) => {
 });
 
 // Start server
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
