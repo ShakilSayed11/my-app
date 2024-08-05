@@ -2,49 +2,50 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
-const { MongoClient } = require('mongodb');
+const { MongoClient, ServerApiVersion } = require('mongodb');
 const dotenv = require('dotenv');
 
-// Load environment variables from .env file
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
-const uri = process.env.MONGO_URI; // Use environment variable
+const uri = process.env.MONGO_URI;
 
-// Middleware
 app.use(bodyParser.json());
 app.use(session({
   secret: 'secret',
   resave: false,
   saveUninitialized: true,
-  store: MongoStore.create({ mongoUrl: uri }) // Use MongoStore
+  store: MongoStore.create({ mongoUrl: uri })
 }));
 
-// Connect to MongoDB
+const client = new MongoClient(uri, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  }
+});
+
 async function connectToMongoDB() {
-  const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
   try {
     await client.connect();
-    console.log("Connected to MongoDB");
-    return client;
+    await client.db("admin").command({ ping: 1 });
+    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    return client.db('yourDatabaseName'); // Replace 'yourDatabaseName' with your actual database name
   } catch (error) {
     console.error("Failed to connect to MongoDB", error);
-    process.exit(1); // Exit the process with an error code
+    process.exit(1);
   }
 }
 
-// Define routes
 async function main() {
-  const client = await connectToMongoDB();
-  const db = client.db('yourDatabaseName'); // Replace with your database name
+  const db = await connectToMongoDB();
 
-  // Sample endpoint to check server status
   app.get('/', (req, res) => {
     res.send('Server is running');
   });
 
-  // User login endpoint
   app.post('/login', async (req, res) => {
     const { username, password } = req.body;
     const user = await db.collection('users').findOne({ username, password });
@@ -56,13 +57,11 @@ async function main() {
     }
   });
 
-  // Fetch agent list endpoint
   app.get('/agents', async (req, res) => {
     const agents = await db.collection('agents').find({}).toArray();
     res.json(agents);
   });
 
-  // Start the server
   app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
   });
