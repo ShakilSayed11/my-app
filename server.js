@@ -1,70 +1,34 @@
 const express = require('express');
-const bodyParser = require('body-parser');
-const session = require('express-session');
-const MongoStore = require('connect-mongo');
-const { MongoClient, ServerApiVersion } = require('mongodb');
-const dotenv = require('dotenv');
-
-dotenv.config();
+const { createClient } = require('@supabase/supabase-js');
+require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 3000;
-const uri = process.env.MONGO_URI;
 
-app.use(bodyParser.json());
-app.use(session({
-  secret: 'secret',
-  resave: false,
-  saveUninitialized: true,
-  store: MongoStore.create({ mongoUrl: uri })
-}));
+// Initialize Supabase client
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
-const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
+// Middleware to parse JSON requests
+app.use(express.json());
+
+// Sample route for connecting to Supabase and fetching data
+app.get('/test', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('your-table') // Replace with your table name
+      .select('*');
+
+    if (error) {
+      throw error;
+    }
+
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
-async function connectToMongoDB() {
-  try {
-    await client.connect();
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
-    return client.db('yourDatabaseName'); // Replace 'yourDatabaseName' with your actual database name
-  } catch (error) {
-    console.error("Failed to connect to MongoDB", error);
-    process.exit(1);
-  }
-}
-
-async function main() {
-  const db = await connectToMongoDB();
-
-  app.get('/', (req, res) => {
-    res.send('Server is running');
-  });
-
-  app.post('/login', async (req, res) => {
-    const { username, password } = req.body;
-    const user = await db.collection('users').findOne({ username, password });
-    if (user) {
-      req.session.userId = user._id;
-      res.status(200).send('Login successful');
-    } else {
-      res.status(401).send('Invalid credentials');
-    }
-  });
-
-  app.get('/agents', async (req, res) => {
-    const agents = await db.collection('agents').find({}).toArray();
-    res.json(agents);
-  });
-
-  app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
-  });
-}
-
-main().catch(console.error);
+// Start the server
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
