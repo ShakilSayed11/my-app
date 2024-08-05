@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Manage Users</title>
+</head>
+<body>
+    <h1>Admin - Manage Users</h1>
+    <form action="/admin/users/create" method="post">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+        <br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <br>
+        <button type="submit">Create User</button>
+    </form>
+
+    <h2>Existing Users</h2>
+    <ul id="userList"></ul>
+
+    <script>
+        async function loadUsers() {
+            const response = await fetch('/admin/users/list');
+            const users = await response.json();
+            const userList = document.getElementById('userList');
+            users.forEach(user => {
+                const li = document.createElement('li');
+                li.textContent = user.username;
+                userList.appendChild(li);
+            });
+        }
+
+        loadUsers();
+    </script>
+</body>
+</html>
