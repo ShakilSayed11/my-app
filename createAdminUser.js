@@ -9,9 +9,15 @@ async function createAdminUser() {
   const password = 'admin_password'; // Change to the desired admin password
   const hashedPassword = await bcrypt.hash(password, 10);
 
+  // Disable RLS
+  await supabase.rpc('enable_rls', { table_name: 'users', enable: false });
+
   const { error } = await supabase
     .from('users')
     .insert([{ username, password: hashedPassword, role: 'admin' }]);
+
+  // Re-enable RLS
+  await supabase.rpc('enable_rls', { table_name: 'users', enable: true });
 
   if (error) {
     console.error('Error creating admin user:', error);
@@ -20,4 +26,4 @@ async function createAdminUser() {
   }
 }
 
-module.exports = createAdminUser;
+createAdminUser();
