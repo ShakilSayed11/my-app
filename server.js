@@ -6,10 +6,14 @@ const { createClient } = require('@supabase/supabase-js');
 const ejs = require('ejs');
 const path = require('path');
 const bodyParser = require('body-parser');
+const bcrypt = require('bcryptjs');
 const app = express();
 
 // Initialize Supabase
-const supabase = createClient('https://dwcbvbpwkfmydeucsydj.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3Y2J2YnB3a2ZteWRldWNzeWRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjI4NTQ2NTMsImV4cCI6MjAzODQzMDY1M30.g688zmPnGmwu9oBt7YrfUmtivDohDyiEYPQP-lz16GI');
+const supabase = createClient(
+  'https://dwcbvbpwkfmydeucsydj.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3Y2J2YnB3a2ZteWRldWNzeWRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjI4NTQ2NTMsImV4cCI6MjAzODQzMDY1M30.g688zmPnGmwu9oBt7YrfUmtivDohDyiEYPQP-lz16GI'
+);
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -48,13 +52,14 @@ app.post('/login', async (req, res) => {
     .eq('username', username)
     .single();
 
-  if (error || !data || data.password !== password) {
+  if (error || !data || !(await bcrypt.compare(password, data.password))) {
     return res.status(401).send('Invalid credentials');
   }
 
   // Store user session
   req.session.isLoggedIn = true;
   req.session.username = username;
+  req.session.isAdmin = data.role === 'admin';
 
   res.redirect('/');
 });
@@ -106,25 +111,33 @@ app.get('/inform-outage', (req, res) => {
 // Admin Page Route
 app.get('/admin', (req, res) => {
   if (req.session.isLoggedIn && req.session.isAdmin) {
-    res.render('admin'); // Render admin page
+    res.render('admin-users'); // Render admin page
   } else {
     res.redirect('/login');
   }
 });
 
 app.post('/admin/add-user', async (req, res) => {
-  const { username, password } = req.body;
+  const { username, password, role } = req.body;
 
-  // Insert new user into Supabase
-  const { error } = await supabase
-    .from('users')
-    .insert([{ username, password }]);
+  try {
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-  if (error) {
-    return res.status(500).send('Failed to add user');
+    // Insert new user into Supabase
+    const { error } = await supabase
+      .from('users')
+      .insert([{ username, password: hashedPassword, role }]);
+
+    if (error) {
+      throw error;
+    }
+
+    res.json({ message: 'User created successfully' });
+  } catch (error) {
+    console.error('Error creating user:', error);
+    res.status(500).json({ message: 'Failed to create user' });
   }
-
-  res.redirect('/admin');
 });
 
 // Start server
