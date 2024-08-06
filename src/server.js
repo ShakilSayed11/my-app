@@ -231,7 +231,7 @@ app.get('/admin', authenticateJWT, (req, res) => {
     }
 });
 
-// Add this route to serve the productivity form
+// Serve the productivity form page
 app.get('/productivity-form', authenticateJWT, (req, res) => {
     if (req.user.role === 'user') {
         res.sendFile(path.join(__dirname, '../public/productivity-form.html'));
@@ -240,23 +240,13 @@ app.get('/productivity-form', authenticateJWT, (req, res) => {
     }
 });
 
-app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
-});
-
-
-// Serve the productivity form page
-app.get('/productivity-form', authenticateJWT, (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/productivity-form.html'));
-});
-
 // Handle data submission from the productivity form
 app.post('/submit-productivity', authenticateJWT, async (req, res) => {
     const { agentName, workingDepartment, workingRegion, ticketNumber, taskDate, emailTime, task, timeTaken, taskDetails } = req.body;
 
     try {
         const { error } = await supabase
-            .from('productivity_data') // Adjust table name if needed
+            .from('productivity_data')
             .insert([{ 
                 agent_name: agentName,
                 working_department: workingDepartment,
@@ -280,3 +270,6 @@ app.post('/submit-productivity', authenticateJWT, async (req, res) => {
     }
 });
 
+app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+});
