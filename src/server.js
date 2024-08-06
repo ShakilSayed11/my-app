@@ -5,22 +5,19 @@ const path = require('path');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
-require('dotenv').config(); // For loading environment variables
+require('dotenv').config(); // Load environment variables
 
 const app = express();
 const port = process.env.PORT || 10000;
 
-// Initialize Supabase client with environment variables
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 
-// Middleware
 app.use(bodyParser.json());
 app.use(cookieParser());
+app.use(express.static(path.join(__dirname, '../public'))); // Serve static files
 
-// Middleware for checking JWT and setting user role
 const authenticateJWT = (req, res, next) => {
     const token = req.cookies.token;
-
     if (token) {
         jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
             if (err) {
@@ -34,10 +31,8 @@ const authenticateJWT = (req, res, next) => {
     }
 };
 
-// Login endpoint
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
-
     const { data, error } = await supabase
         .from('user_credentials')
         .select('*')
@@ -59,7 +54,6 @@ app.post('/login', async (req, res) => {
     res.json({ message: 'Login successful' });
 });
 
-// Add user endpoint (requires admin role)
 app.post('/add-user', authenticateJWT, async (req, res) => {
     const { username, password } = req.body;
 
@@ -69,7 +63,6 @@ app.post('/add-user', authenticateJWT, async (req, res) => {
 
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
-
         const { data, error } = await supabase
             .from('user_credentials')
             .insert([{ username, password_hash: hashedPassword, roles: ['user'] }]);
@@ -85,10 +78,8 @@ app.post('/add-user', authenticateJWT, async (req, res) => {
     }
 });
 
-// Dashboard endpoint
 app.get('/dashboard', authenticateJWT, (req, res) => {
     const role = req.user.role;
-
     if (role === 'admin') {
         res.redirect('/admin');
     } else if (role === 'user') {
@@ -98,13 +89,17 @@ app.get('/dashboard', authenticateJWT, (req, res) => {
     }
 });
 
-// Admin endpoint
 app.get('/admin', authenticateJWT, (req, res) => {
     if (req.user.role === 'admin') {
         res.sendFile(path.join(__dirname, '../public/admin.html'));
     } else {
         res.status(403).send('Access denied');
     }
+});
+
+// Catch-All Route
+app.use((req, res) => {
+    res.status(404).send('Page not found');
 });
 
 app.listen(port, () => {
