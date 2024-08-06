@@ -46,7 +46,11 @@ app.post('/login', async (req, res) => {
     }
 });
 
+// Serve login page
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/public/login.html');
+});
+
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
-
