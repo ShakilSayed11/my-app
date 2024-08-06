@@ -4,42 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Productivity Form</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.min.js"></script>
+    <script src="productivity-form.js" defer></script>
 </head>
 <body>
     <h1>Productivity Form</h1>
     <form id="productivity-form">
-        <label for="agent">Agent:</label>
-        <select id="agent" name="agent" required>
-            <option value="" disabled selected>Select Agent</option>
-            <!-- Options will be added by JavaScript -->
-        </select>
-        <br><br>
+        <label for="agent-name">Agent Name:</label>
+        <input type="text" id="agent-name" name="agent-name" required><br><br>
 
-        <label for="department">Department:</label>
+        <label for="department">Working Department:</label>
         <select id="department" name="department" required>
-            <option value="" disabled selected>Select Department</option>
-            <option value="Oxford Direct">Oxford Direct</option>
-            <option value="Pathways">Pathways</option>
-        </select>
-        <br><br>
+            <option value="" selected>Select</option>
+        </select><br><br>
 
-        <label for="region">Region:</label>
+        <label for="region">Working Region:</label>
         <select id="region" name="region" required>
-            <option value="" disabled selected>Select Region</option>
-            <!-- Options will be added by JavaScript -->
-        </select>
-        <br><br>
+            <option value="" selected>Select</option>
+        </select><br><br>
 
-        <label for="task">Task:</label>
-        <select id="task" name="task" required>
-            <option value="" disabled selected>Select Task</option>
-            <!-- Add other tasks similarly -->
-        </select>
-        <br><br>
+        <label for="ticket-number">Ticket Number:</label>
+        <input type="number" id="ticket-number" name="ticket-number" min="100000" max="999999" required><br><br>
+
+        <label for="task-date">Task Date:</label>
+        <input type="date" id="task-date" name="task-date" required><br><br>
+
+        <label for="email-time">Email Time:</label>
+        <input type="text" id="email-time" name="email-time" placeholder="hh:mm" required pattern="\d{2}:\d{2}"><br><br>
+
+        <label for="task-name">Task Name:</label>
+        <input type="text" id="task-name" name="task-name" required><br><br>
+
+        <label for="task-time">Task Time:</label>
+        <input type="text" id="task-time" name="task-time" placeholder="hh:mm" required pattern="\d{2}:\d{2}"><br><br>
 
         <input type="submit" value="Submit">
     </form>
-
-    <script src="productivity-form.js"></script>
 </body>
 </html>
