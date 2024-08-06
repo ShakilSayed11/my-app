@@ -1,10 +1,7 @@
+// Initialize Supabase at the very top of the file
 const supabaseUrl = 'https://dwcbvbpwkfmydeucsydj.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3Y2J2YnB3a2ZteWRldWNzeWRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjI4NTQ2NTMsImV4cCI6MjAzODQzMDY1M30.g688zmPnGmwu9oBt7YrfUmtivDohDyiEYPQP-lz16GI';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3Y2J2YnB3a2ZteWRldWNzeWRqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyMjg1NDY1MywiZXhwIjoyMDM4NDMwNjUzfQ.51c7anMSPbGU6MGpzUbJZz9rhorFNOFOxUCizY62l7M';
 const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-
-document.addEventListener('DOMContentLoaded', async () => {
-    await populateDropdowns();
-});
 
 async function populateDropdowns() {
     try {
@@ -46,6 +43,10 @@ async function populateDropdowns() {
         console.error('Error populating dropdowns:', err);
     }
 }
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await populateDropdowns();
+});
 
 const form = document.getElementById('productivity-form');
 
