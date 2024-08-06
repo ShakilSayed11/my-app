@@ -9,7 +9,7 @@ const cookieParser = require('cookie-parser');
 const app = express();
 const port = process.env.PORT || 10000;
 
-const supabase = createClient('https://dwcbvbpwkfmydeucsydj.supabase.co', 'YOUR_SUPABASE_KEY');
+const supabase = createClient('https://dwcbvbpwkfmydeucsydj.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3Y2J2YnB3a2ZteWRldWNzeWRqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyMjg1NDY1MywiZXhwIjoyMDM4NDMwNjUzfQ.51c7anMSPbGU6MGpzUbJZz9rhorFNOFOxUCizY62l7M');
 
 app.use(bodyParser.json());
 app.use(cookieParser());
