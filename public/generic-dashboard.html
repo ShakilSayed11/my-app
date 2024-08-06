@@ -58,14 +58,11 @@
         th {
             background-color: #f4f4f4;
         }
-        #form-container {
-            display: none; /* Initially hidden */
-        }
     </style>
 </head>
 <body>
     <div class="navbar">
-        <a href="/productivity-form" id="nav-productivity">Productivity Form</a>
+        <a href="/productivity-form">Productivity Form</a>
         <a href="/report-outage">Report Outage</a>
         <a href="/roster">Roster</a>
     </div>
@@ -91,47 +88,6 @@
                 </tbody>
             </table>
         </div>
-    </div>
-    <div id="form-container">
-        <h2>Productivity Submission Form</h2>
-        <form id="productivity-form">
-            <label for="agent-name">Agent Name:</label>
-            <select id="agent-name" required>
-                <!-- Populate dropdown options dynamically -->
-            </select>
-            <br>
-            <label for="working-department">Working Department:</label>
-            <select id="working-department" required>
-                <!-- Populate dropdown options dynamically -->
-            </select>
-            <br>
-            <label for="working-region">Working Region:</label>
-            <select id="working-region" required>
-                <!-- Populate dropdown options dynamically -->
-            </select>
-            <br>
-            <label for="ticket-number">Ticket Number:</label>
-            <input type="number" id="ticket-number" max="999999" required>
-            <br>
-            <label for="task-date">Task Date:</label>
-            <input type="date" id="task-date" value="${new Date().toISOString().split('T')[0]}" readonly>
-            <br>
-            <label for="email-time">Email Time:</label>
-            <input type="time" id="email-time" required>
-            <br>
-            <label for="task">Task:</label>
-            <select id="task" required>
-                <!-- Populate dropdown options dynamically -->
-            </select>
-            <br>
-            <label for="time-taken">Time Taken (Hour's/Min's):</label>
-            <input type="text" id="time-taken" placeholder="hh:mm" required>
-            <br>
-            <label for="task-details">Task Details:</label>
-            <textarea id="task-details" rows="4" cols="50"></textarea>
-            <br>
-            <button type="submit">Submit</button>
-        </form>
     </div>
     <script>
         async function fetchData() {
@@ -161,49 +117,8 @@
             });
         }
 
-        async function submitProductivityForm(event) {
-            event.preventDefault();
-
-            const agentName = document.getElementById('agent-name').value;
-            const workingDepartment = document.getElementById('working-department').value;
-            const workingRegion = document.getElementById('working-region').value;
-            const ticketNumber = document.getElementById('ticket-number').value;
-            const taskDate = document.getElementById('task-date').value;
-            const emailTime = document.getElementById('email-time').value;
-            const task = document.getElementById('task').value;
-            const timeTaken = document.getElementById('time-taken').value;
-            const taskDetails = document.getElementById('task-details').value;
-
-            const response = await fetch('/submit-productivity', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ agentName, workingDepartment, workingRegion, ticketNumber, taskDate, emailTime, task, timeTaken, taskDetails })
-            });
-
-            const result = await response.json();
-            if (response.ok) {
-                alert('Submission successful');
-                document.getElementById('form-container').style.display = 'none';
-            } else {
-                alert('Error: ' + result.error);
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            fetchData();
-
-            // Show the productivity form if the URL path is `/productivity-form`
-            if (window.location.pathname === '/productivity-form') {
-                document.getElementById('productivity-info').style.display = 'none';
-                document.querySelector('.table-container').style.display = 'none';
-                document.getElementById('form-container').style.display = 'block';
-            }
-
-            // Handle form submission
-            document.getElementById('productivity-form').addEventListener('submit', submitProductivityForm);
-        });
+        // Call fetchData on page load
+        document.addEventListener('DOMContentLoaded', fetchData);
     </script>
 </body>
 </html>
