@@ -4,67 +4,57 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Productivity Form</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS file -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.min.js"></script> <!-- Include Supabase client library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.min.js"></script>
+    <script src="productivity-form.js"></script>
 </head>
 <body>
-    <div class="navbar">
+    <nav>
         <a href="/productivity-form">Productivity Form</a>
         <a href="/report-outage">Report Outage</a>
         <a href="/roster">Roster</a>
-    </div>
+    </nav>
     <h1>Productivity Form</h1>
     <form id="productivity-form">
-        <div>
-            <label for="agent-name">Agent Name:</label>
-            <select id="agent-name" name="agent_name" required>
-                <option value="">Select Agent</option>
-                <!-- Options will be populated here by JavaScript -->
-            </select>
-        </div>
-        <div>
-            <label for="working-department">Department:</label>
-            <select id="working-department" name="working_department" required>
-                <option value="">Select Department</option>
-                <!-- Options will be populated here by JavaScript -->
-            </select>
-        </div>
-        <div>
-            <label for="working-region">Region:</label>
-            <select id="working-region" name="working_region">
-                <option value="">Select Region</option>
-                <!-- Options will be populated here by JavaScript -->
-            </select>
-        </div>
-        <div>
-            <label for="ticket-number">Ticket Number:</label>
-            <input type="text" id="ticket-number" name="ticket_number" required>
-        </div>
-        <div>
-            <label for="task-date">Task Date:</label>
-            <input type="date" id="task-date" name="task_date" required>
-        </div>
-        <div>
-            <label for="email-time">Email Time:</label>
-            <input type="text" id="email-time" name="email_time" required>
-        </div>
-        <div>
-            <label for="task">Task:</label>
-            <select id="task" name="task" required>
-                <option value="">Select Task</option>
-                <!-- Options will be populated here by JavaScript -->
-            </select>
-        </div>
-        <div>
-            <label for="time-taken">Time Taken:</label>
-            <input type="text" id="time-taken" name="time_taken" required>
-        </div>
-        <div>
-            <label for="task-details">Task Details:</label>
-            <textarea id="task-details" name="task_details" rows="4" required></textarea>
-        </div>
+        <label for="agent-name">Agent Name:</label>
+        <select id="agent-name" required>
+            <option value="">Select Agent</option>
+            <!-- Options will be populated dynamically -->
+        </select>
+        
+        <label for="working-department">Working Department:</label>
+        <select id="working-department" required>
+            <option value="">Select Department</option>
+            <!-- Options will be populated dynamically -->
+        </select>
+
+        <label for="working-region">Working Region:</label>
+        <select id="working-region" class="hidden" required>
+            <option value="">Select Region</option>
+            <!-- Options will be populated dynamically -->
+        </select>
+
+        <label for="ticket-number">Ticket Number:</label>
+        <input type="number" id="ticket-number" max="999999" required>
+
+        <label for="task-date">Task Date:</label>
+        <input type="date" id="task-date" value="" readonly>
+
+        <label for="email-time">Email Time:</label>
+        <input type="time" id="email-time" required>
+
+        <label for="task">Task:</label>
+        <select id="task" required>
+            <option value="">Select Task</option>
+            <!-- Options will be populated dynamically -->
+        </select>
+
+        <label for="time-taken">Time Taken:</label>
+        <input type="time" id="time-taken" required>
+
+        <label for="task-details">Task Details:</label>
+        <textarea id="task-details" required></textarea>
+
         <button type="submit">Submit</button>
     </form>
-    <script src="productivity-form.js"></script> <!-- Include your JavaScript file -->
 </body>
 </html>
