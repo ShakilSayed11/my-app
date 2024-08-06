@@ -13,7 +13,7 @@ const supabase = createClient('https://dwcbvbpwkfmydeucsydj.supabase.co', 'eyJhb
 
 // Middleware
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, '../public'))); // Adjusted path to point to the public directory
+app.use(express.static(path.join(__dirname, '../public'))); // Corrected path
 
 // Login endpoint
 app.post('/login', async (req, res) => {
@@ -49,7 +49,7 @@ app.post('/login', async (req, res) => {
 
 // Serve login page
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public', 'login.html')); // Adjusted path to correctly locate login.html
+    res.sendFile(path.join(__dirname, '../public', 'login.html')); // Corrected path
 });
 
 app.listen(port, () => {
