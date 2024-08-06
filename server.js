@@ -45,8 +45,8 @@ app.post('/login', async (req, res) => {
   const { username, password } = req.body;
   console.log(`Login attempt with username: ${username}`);
 
-  // Query Supabase to verify user credentials
   try {
+    // Query Supabase to verify user credentials
     const { data, error } = await supabase
       .from('users')
       .select('*')
