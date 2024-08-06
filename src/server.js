@@ -42,14 +42,19 @@ app.post('/login', async (req, res) => {
 
     console.log(`Attempting to log in user: ${username}`);
 
-    const { data, error } = await supabase
+    const { data, error, count } = await supabase
         .from('user_credentials')
-        .select('*')
+        .select('*', { count: 'exact' }) // Retrieve the count of rows as well
         .eq('username', username)
-        .single();
+        .single(); // Expecting a single row
 
-    if (error || !data) {
+    if (error) {
         console.error('Error fetching user:', error);
+        return res.status(400).json({ error: 'Invalid username or password' });
+    }
+
+    if (!data) {
+        console.error('No user found');
         return res.status(400).json({ error: 'Invalid username or password' });
     }
 
@@ -116,4 +121,3 @@ app.get('/admin', authenticateJWT, (req, res) => {
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
-
