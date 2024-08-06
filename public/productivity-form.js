@@ -1,11 +1,9 @@
-import { createClient } from '@supabase/supabase-js';
-
-// Initialize Supabase client with provided URL and key
-const supabaseUrl = 'https://dwcbvbpwkfmydeucsydj.supabase.co';
-const supabaseKey = process.env.SUPABASE_ANON_KEY; // Ensure this is set in your environment
-const supabase = createClient(supabaseUrl, supabaseKey);
-
 document.addEventListener('DOMContentLoaded', function () {
+    // Initialize Supabase client with provided URL and key
+    const supabaseUrl = 'https://dwcbvbpwkfmydeucsydj.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3Y2J2YnB3a2ZteWRldWNzeWRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjI4NTQ2NTMsImV4cCI6MjAzODQzMDY1M30.g688zmPnGmwu9oBt7YrfUmtivDohDyiEYPQP-lz16GI'; // Replace with your actual key
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
     const form = document.querySelector('#productivity-form');
 
     // Data for dropdowns
@@ -60,6 +58,15 @@ document.addEventListener('DOMContentLoaded', function () {
         "BPP SOP Review - 0:25", "Unsuccessful Interview - 0:15", "Mercy GPA Checks - 0:20", "Pal Sop - 0:25", "Pal Completed - 0:20", "Pending document - 0:15", "Training By Trainer",
         "Task assigned by TL / Manager", "Test Entry do not use it"
     ];
+
+    // Fill agents dropdown
+    const agentSelect = document.querySelector('#agent-name');
+    agents.forEach(agent => {
+        const option = document.createElement('option');
+        option.value = agent;
+        option.textContent = agent;
+        agentSelect.appendChild(option);
+    });
 
     // Fill agents dropdown
     const agentSelect = document.querySelector('#agent-name');
