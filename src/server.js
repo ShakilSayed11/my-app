@@ -15,6 +15,7 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '../public')));
 
+// Middleware for checking JWT and setting user role
 const authenticateJWT = (req, res, next) => {
     const token = req.cookies.token;
 
@@ -30,6 +31,11 @@ const authenticateJWT = (req, res, next) => {
         res.sendStatus(401);
     }
 };
+
+// Root route to serve the login page
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/login.html'));
+});
 
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
@@ -110,3 +116,4 @@ app.get('/admin', authenticateJWT, (req, res) => {
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
+
