@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productivity Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .form-container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group select, .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .form-group input[type="number"] {
+            max-width: 150px;
+        }
+        .form-group input[type="date"] {
+            max-width: 250px;
+        }
+        .form-group input[type="time"] {
+            max-width: 150px;
+        }
+        .form-group select.hidden, .form-group input.hidden {
+            display: none;
+        }
+        .form-group button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        .form-group button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h1>Productivity Form</h1>
+        <form id="productivity-form">
+            <div class="form-group">
+                <label for="agent-name">Agent Name</label>
+                <select id="agent-name" name="agentName" required>
+                    <!-- Add options dynamically or statically -->
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="working-department">Working Department</label>
+                <select id="working-department" name="workingDepartment" required>
+                    <!-- Add options dynamically or statically -->
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="working-region">Working Region</label>
+                <select id="working-region" name="workingRegion" class="hidden" required>
+                    <!-- Options will be dynamically added based on department -->
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="ticket-number">Ticket Number</label>
+                <input type="number" id="ticket-number" name="ticketNumber" max="999999" required>
+            </div>
+
+            <div class="form-group">
+                <label for="task-date">Task Date</label>
+                <input type="date" id="task-date" name="taskDate" value="" readonly>
+            </div>
+
+            <div class="form-group">
+                <label for="email-time">Email Time</label>
+                <input type="time" id="email-time" name="emailTime" required>
+            </div>
+
+            <div class="form-group">
+                <label for="task">Task</label>
+                <select id="task" name="task" required>
+                    <!-- Add options dynamically or statically -->
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="time-taken">Time Taken (Hours/Minutes)</label>
+                <input type="text" id="time-taken" name="timeTaken" class="hidden" placeholder="hh:mm">
+            </div>
+
+            <div class="form-group">
+                <label for="task-details">Task Details</label>
+                <input type="text" id="task-details" name="taskDetails" class="hidden" placeholder="Enter details">
+            </div>
+
+            <div class="form-group">
+                <button type="submit">Submit</button>
+            </div>
+        </form>
+    </div>
+    <script src="/productivity-form.js"></script>
+</body>
+</html>
