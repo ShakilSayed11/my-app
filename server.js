@@ -9,8 +9,10 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const app = express();
 
-// Initialize Supabase
-const supabase = createClient('https://dwcbvbpwkfmydeucsydj.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3Y2J2YnB3a2ZteWRldWNzeWRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjI4NTQ2NTMsImV4cCI6MjAzODQzMDY1M30.g688zmPnGmwu9oBt7YrfUmtivDohDyiEYPQP-lz16GI');
+// Initialize Supabase with the correct URL and Anon Key
+const supabaseUrl = 'https://yourproject.supabase.co';
+const supabaseAnonKey = 'YOUR_SUPABASE_ANON_KEY';
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -53,26 +55,30 @@ app.post('/login', async (req, res) => {
   console.log('Supabase response:', { data, error });
 
   if (error || !data) {
-    console.log('Invalid credentials');
+    console.log('Invalid credentials - user not found');
     return res.status(401).json({ message: 'Invalid credentials' });
   }
 
-  const match = await bcrypt.compare(password, data.password);
+  try {
+    const match = await bcrypt.compare(password, data.password);
+    console.log(`Password match: ${match}`);
 
-  console.log(`Password match: ${match}`);
+    if (!match) {
+      console.log('Invalid credentials - password mismatch');
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
 
-  if (!match) {
-    console.log('Invalid credentials');
-    return res.status(401).json({ message: 'Invalid credentials' });
+    // Store user session
+    req.session.isLoggedIn = true;
+    req.session.username = username;
+    req.session.isAdmin = data.role === 'admin';
+
+    console.log('Login successful');
+    res.redirect('/');
+  } catch (err) {
+    console.error('Error during password comparison', err);
+    res.status(500).json({ message: 'Internal server error' });
   }
-
-  // Store user session
-  req.session.isLoggedIn = true;
-  req.session.username = username;
-  req.session.isAdmin = data.role === 'admin';
-
-  console.log('Login successful');
-  res.redirect('/');
 });
 
 // Logout Route
