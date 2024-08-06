@@ -42,11 +42,11 @@ app.post('/login', async (req, res) => {
 
     console.log(`Attempting to log in user: ${username}`);
 
-    const { data, error, count } = await supabase
+    const { data, error } = await supabase
         .from('user_credentials')
-        .select('*', { count: 'exact' }) // Retrieve the count of rows as well
+        .select('*')
         .eq('username', username)
-        .single(); // Expecting a single row
+        .single();
 
     if (error) {
         console.error('Error fetching user:', error);
