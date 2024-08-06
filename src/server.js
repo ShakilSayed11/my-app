@@ -234,3 +234,40 @@ app.get('/admin', authenticateJWT, (req, res) => {
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
+
+
+// Serve the productivity form page
+app.get('/productivity-form', authenticateJWT, (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/productivity-form.html'));
+});
+
+// Handle data submission from the productivity form
+app.post('/submit-productivity', authenticateJWT, async (req, res) => {
+    const { agentName, workingDepartment, workingRegion, ticketNumber, taskDate, emailTime, task, timeTaken, taskDetails } = req.body;
+
+    try {
+        const { error } = await supabase
+            .from('productivity_data') // Adjust table name if needed
+            .insert([{ 
+                agent_name: agentName,
+                working_department: workingDepartment,
+                working_region: workingRegion,
+                ticket_number: ticketNumber,
+                task_date: taskDate,
+                email_time: emailTime,
+                task,
+                time_taken: timeTaken,
+                task_details: taskDetails
+            }]);
+
+        if (error) {
+            return res.status(400).json({ error: error.message });
+        }
+
+        res.status(200).json({ message: 'Productivity data submitted successfully' });
+    } catch (err) {
+        console.error('Error submitting data:', err);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
