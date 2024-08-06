@@ -231,6 +231,15 @@ app.get('/admin', authenticateJWT, (req, res) => {
     }
 });
 
+// Add this route to serve the productivity form
+app.get('/productivity-form', authenticateJWT, (req, res) => {
+    if (req.user.role === 'user') {
+        res.sendFile(path.join(__dirname, '../public/productivity-form.html'));
+    } else {
+        res.status(403).send('Access denied');
+    }
+});
+
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
@@ -268,15 +277,6 @@ app.post('/submit-productivity', authenticateJWT, async (req, res) => {
     } catch (err) {
         console.error('Error submitting data:', err);
         res.status(500).json({ error: 'Server error' });
-    }
-});
-
-// Add this route to serve the productivity form
-app.get('/productivity-form', authenticateJWT, (req, res) => {
-    if (req.user.role === 'user') {
-        res.sendFile(path.join(__dirname, '../public/productivity-form.html'));
-    } else {
-        res.status(403).send('Access denied');
     }
 });
 
