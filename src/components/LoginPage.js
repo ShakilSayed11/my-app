@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient('https://your-supabase-url.supabase.co', 'public-anon-key');
+const supabase = createClient('https://dwcbvbpwkfmydeucsydj.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3Y2J2YnB3a2ZteWRldWNzeWRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjI4NTQ2NTMsImV4cCI6MjAzODQzMDY1M30.g688zmPnGmwu9oBt7YrfUmtivDohDyiEYPQP-lz16GI');
 
 const LoginPage = () => {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
   const handleLogin = async () => {
-    const { user, error } = await supabase.auth.signIn({ email, password });
-    if (error) {
-      console.error('Error logging in:', error.message);
+    const { data, error } = await supabase.rpc('authenticate_user', { p_username: username, p_password: password });
+    if (error || !data.length) {
+      console.error('Error logging in:', error ? error.message : 'Invalid credentials');
     } else {
-      console.log('Logged in user:', user);
+      console.log('Logged in user:', data[0]);
     }
   };
 
@@ -20,10 +20,10 @@ const LoginPage = () => {
     <div>
       <h2>Login</h2>
       <input 
-        type="email" 
-        placeholder="Email" 
-        value={email} 
-        onChange={(e) => setEmail(e.target.value)} 
+        type="text" 
+        placeholder="Username" 
+        value={username} 
+        onChange={(e) => setUsername(e.target.value)} 
       />
       <input 
         type="password" 
@@ -37,4 +37,3 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
-
