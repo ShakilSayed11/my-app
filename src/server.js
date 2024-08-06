@@ -15,7 +15,7 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '../public')));
 
-const jwtSecret = 'YOUR_JWT_SECRET';
+const jwtSecret = 'f85b34d96a0cd74d487d04a036b27243';
 
 // Middleware for checking JWT and setting user role
 const authenticateJWT = (req, res, next) => {
@@ -73,7 +73,11 @@ app.post('/login', async (req, res) => {
             return res.status(400).json({ error: 'Invalid username or password' });
         }
 
-        const token = jwt.sign({ username: data.username, role: data.roles[0] }, jwtSecret, { expiresIn: '1h' });
+        // Assuming roles is a JSON array, parse it
+        const roles = JSON.parse(data.roles);
+
+        // Create JWT token with role
+        const token = jwt.sign({ username: data.username, role: roles[0] }, jwtSecret, { expiresIn: '1h' });
         res.cookie('token', token, { httpOnly: true });
         res.json({ message: 'Login successful' });
     } catch (err) {
