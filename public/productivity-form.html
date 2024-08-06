@@ -4,47 +4,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Productivity Form</title>
-    <!-- Include the Supabase JavaScript library -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.6.0/dist/supabase.min.js"></script>
-    <!-- Include any additional stylesheets here -->
-    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <nav>
-        <!-- Navigation bar content here -->
+        <a href="/dashboard">Dashboard</a>
+        <a href="/admin">Admin</a>
+        <a href="/productivity-form">Productivity Form</a>
     </nav>
-    <form id="productivity-form">
-        <label for="agent-name">Agent Name:</label>
-        <select id="agent-name" name="agent-name"></select>
-
-        <label for="working-department">Working Department:</label>
-        <select id="working-department" name="working-department"></select>
-
-        <label for="working-region">Working Region:</label>
-        <select id="working-region" name="working-region" class="hidden"></select>
-
-        <label for="ticket-number">Ticket Number:</label>
-        <input type="text" id="ticket-number" name="ticket-number">
-
-        <label for="task-date">Task Date:</label>
-        <input type="date" id="task-date" name="task-date">
-
-        <label for="email-time">Email Time:</label>
-        <input type="time" id="email-time" name="email-time">
-
-        <label for="task">Task:</label>
-        <select id="task" name="task"></select>
-
-        <label for="time-taken">Time Taken:</label>
-        <input type="text" id="time-taken" name="time-taken">
-
-        <label for="task-details">Task Details:</label>
-        <textarea id="task-details" name="task-details"></textarea>
-
-        <button type="submit">Submit</button>
-    </form>
-
-    <!-- Include your JavaScript file -->
+    <main>
+        <h1>Productivity Form</h1>
+        <form id="productivity-form">
+            <label for="agent-name">Agent Name:</label>
+            <select id="agent-name" name="agent_name" required></select>
+            
+            <label for="working-department">Working Department:</label>
+            <select id="working-department" name="working_department" required></select>
+            
+            <label for="working-region">Working Region:</label>
+            <select id="working-region" name="working_region" required></select>
+            
+            <label for="ticket-number">Ticket Number:</label>
+            <input type="text" id="ticket-number" name="ticket_number" required>
+            
+            <label for="task-date">Task Date:</label>
+            <input type="date" id="task-date" name="task_date" required>
+            
+            <label for="email-time">Email Time:</label>
+            <input type="text" id="email-time" name="email_time" required>
+            
+            <label for="task">Task:</label>
+            <select id="task" name="task" required></select>
+            
+            <label for="time-taken">Time Taken:</label>
+            <input type="text" id="time-taken" name="time_taken" required>
+            
+            <label for="task-details">Task Details:</label>
+            <textarea id="task-details" name="task_details" required></textarea>
+            
+            <button type="submit">Submit</button>
+        </form>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="productivity-form.js"></script>
 </body>
 </html>
