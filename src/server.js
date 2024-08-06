@@ -6,14 +6,14 @@ const jwt = require('jsonwebtoken');
 const path = require('path');
 
 const app = express();
-const port = process.env.PORT || 10000; // Ensure port matches the deployment
+const port = process.env.PORT || 10000; // Ensure the port matches the deployment
 
 // Supabase client setup
 const supabase = createClient('https://dwcbvbpwkfmydeucsydj.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3Y2J2YnB3a2ZteWRldWNzeWRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjI4NTQ2NTMsImV4cCI6MjAzODQzMDY1M30.g688zmPnGmwu9oBt7YrfUmtivDohDyiEYPQP-lz16GI');
 
 // Middleware
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '../public'))); // Adjusted path to point to the public directory
 
 // Login endpoint
 app.post('/login', async (req, res) => {
@@ -49,7 +49,7 @@ app.post('/login', async (req, res) => {
 
 // Serve login page
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'login.html'));
+    res.sendFile(path.join(__dirname, '../public', 'login.html')); // Adjusted path to correctly locate login.html
 });
 
 app.listen(port, () => {
