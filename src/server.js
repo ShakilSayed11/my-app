@@ -3,14 +3,17 @@ const { createClient } = require('@supabase/supabase-js');
 const bodyParser = require('body-parser');
 const path = require('path');
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken'); // For handling JWTs
-const cookieParser = require('cookie-parser'); // For parsing cookies
+const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
+require('dotenv').config(); // For loading environment variables
 
 const app = express();
 const port = process.env.PORT || 10000;
 
-const supabase = createClient('https://dwcbvbpwkfmydeucsydj.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3Y2J2YnB3a2ZteWRldWNzeWRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjI4NTQ2NTMsImV4cCI6MjAzODQzMDY1M30.g688zmPnGmwu9oBt7YrfUmtivDohDyiEYPQP-lz16GI');
+// Initialize Supabase client with environment variables
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 
+// Middleware
 app.use(bodyParser.json());
 app.use(cookieParser());
 
@@ -19,7 +22,7 @@ const authenticateJWT = (req, res, next) => {
     const token = req.cookies.token;
 
     if (token) {
-        jwt.verify(token, 'f85b34d96a0cd74d487d04a036b27243', (err, user) => {
+        jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
             if (err) {
                 return res.sendStatus(403);
             }
@@ -31,6 +34,7 @@ const authenticateJWT = (req, res, next) => {
     }
 };
 
+// Login endpoint
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
@@ -50,11 +54,12 @@ app.post('/login', async (req, res) => {
         return res.status(400).json({ error: 'Invalid username or password' });
     }
 
-    const token = jwt.sign({ username: data.username, role: data.roles[0] }, 'f85b34d96a0cd74d487d04a036b27243', { expiresIn: '1h' });
+    const token = jwt.sign({ username: data.username, role: data.roles[0] }, process.env.JWT_SECRET, { expiresIn: '1h' });
     res.cookie('token', token, { httpOnly: true });
     res.json({ message: 'Login successful' });
 });
 
+// Add user endpoint (requires admin role)
 app.post('/add-user', authenticateJWT, async (req, res) => {
     const { username, password } = req.body;
 
@@ -80,6 +85,7 @@ app.post('/add-user', authenticateJWT, async (req, res) => {
     }
 });
 
+// Dashboard endpoint
 app.get('/dashboard', authenticateJWT, (req, res) => {
     const role = req.user.role;
 
@@ -92,6 +98,7 @@ app.get('/dashboard', authenticateJWT, (req, res) => {
     }
 });
 
+// Admin endpoint
 app.get('/admin', authenticateJWT, (req, res) => {
     if (req.user.role === 'admin') {
         res.sendFile(path.join(__dirname, '../public/admin.html'));
