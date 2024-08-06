@@ -15,7 +15,6 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '../public')));
 
-// Middleware for checking JWT and setting user role
 const authenticateJWT = (req, res, next) => {
     const token = req.cookies.token;
 
@@ -35,6 +34,8 @@ const authenticateJWT = (req, res, next) => {
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
+    console.log(`Attempting to log in user: ${username}`);
+
     const { data, error } = await supabase
         .from('user_credentials')
         .select('*')
@@ -42,10 +43,15 @@ app.post('/login', async (req, res) => {
         .single();
 
     if (error || !data) {
+        console.error('Error fetching user:', error);
         return res.status(400).json({ error: 'Invalid username or password' });
     }
 
+    console.log('User fetched from database:', data);
+
     const isMatch = await bcrypt.compare(password, data.password_hash);
+
+    console.log(`Password match: ${isMatch}`);
 
     if (!isMatch) {
         return res.status(400).json({ error: 'Invalid username or password' });
