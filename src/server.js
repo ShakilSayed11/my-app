@@ -38,9 +38,9 @@ const authenticateJWT = (req, res, next) => {
     }
 };
 
-// Basic route for testing
+// Serve login page at root URL
 app.get('/', (req, res) => {
-    res.send('Server is up and running!');
+    res.sendFile(path.join(__dirname, '../public/login.html'));
 });
 
 // Login route
