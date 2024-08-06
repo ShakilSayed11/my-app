@@ -1,11 +1,12 @@
+import { createClient } from '@supabase/supabase-js';
+
+// Initialize Supabase client with provided URL and key
+const supabaseUrl = 'https://dwcbvbpwkfmydeucsydj.supabase.co';
+const supabaseKey = process.env.SUPABASE_ANON_KEY; // Ensure this is set in your environment
+const supabase = createClient(supabaseUrl, supabaseKey);
+
 document.addEventListener('DOMContentLoaded', function () {
     const form = document.querySelector('#productivity-form');
-
-    // Initialize Supabase client
-    const { createClient } = supabase;
-    const supabaseUrl = 'https://your-project.supabase.co';
-    const supabaseKey = 'your-anon-key';
-    const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Data for dropdowns
     const agents = [
