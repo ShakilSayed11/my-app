@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Productivity Form</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Load Supabase JS library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.0.0/dist/supabase.min.js"></script>
 </head>
 <body>
     <nav>
@@ -24,27 +27,149 @@
             <select id="working-region" name="working_region" required></select>
             
             <label for="ticket-number">Ticket Number:</label>
-            <input type="text" id="ticket-number" name="ticket_number" required>
+            <input type="text" id="ticket-number" name="ticket_number">
             
             <label for="task-date">Task Date:</label>
-            <input type="date" id="task-date" name="task_date" required>
+            <input type="date" id="task-date" name="task_date">
             
             <label for="email-time">Email Time:</label>
-            <input type="text" id="email-time" name="email_time" required>
+            <input type="time" id="email-time" name="email_time">
             
             <label for="task">Task:</label>
             <select id="task" name="task" required></select>
             
             <label for="time-taken">Time Taken:</label>
-            <input type="text" id="time-taken" name="time_taken" required>
+            <input type="text" id="time-taken" name="time_taken">
             
             <label for="task-details">Task Details:</label>
-            <textarea id="task-details" name="task_details" required></textarea>
+            <textarea id="task-details" name="task_details"></textarea>
             
             <button type="submit">Submit</button>
         </form>
     </main>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="productivity-form.js"></script>
+    <!-- Include your JavaScript file here -->
+    <script>
+        // Initialize Supabase client
+        const supabaseUrl = 'https://dwcbvbpwkfmydeucsydj.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3Y2J2YnB3a2ZteWRldWNzeWRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjI4NTQ2NTMsImV4cCI6MjAzODQzMDY1M30.g688zmPnGmwu9oBt7YrfUmtivDohDyiEYPQP-lz16GI';
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+        async function fetchAgentNames() {
+            const { data, error } = await supabase.from('agent_names').select('*');
+            if (error) {
+                console.error('Error fetching agent names:', error);
+                return [];
+            }
+            return data;
+        }
+
+        async function fetchDepartments() {
+            const { data, error } = await supabase.from('departments').select('*');
+            if (error) {
+                console.error('Error fetching departments:', error);
+                return [];
+            }
+            return data;
+        }
+
+        async function fetchRegions(departmentId) {
+            const { data, error } = await supabase.from('regions').select('*').eq('department_id', departmentId);
+            if (error) {
+                console.error('Error fetching regions:', error);
+                return [];
+            }
+            return data;
+        }
+
+        async function fetchTasks() {
+            const { data, error } = await supabase.from('tasks').select('*');
+            if (error) {
+                console.error('Error fetching tasks:', error);
+                return [];
+            }
+            return data;
+        }
+
+        async function populateDropdowns() {
+            const agentNames = await fetchAgentNames();
+            const agentNameDropdown = document.getElementById('agent-name');
+            agentNames.forEach(agent => {
+                const option = document.createElement('option');
+                option.value = agent.id;
+                option.textContent = agent.name;
+                agentNameDropdown.appendChild(option);
+            });
+
+            const departments = await fetchDepartments();
+            const departmentDropdown = document.getElementById('working-department');
+            departments.forEach(department => {
+                const option = document.createElement('option');
+                option.value = department.id;
+                option.textContent = department.name;
+                departmentDropdown.appendChild(option);
+            });
+
+            const tasks = await fetchTasks();
+            const taskDropdown = document.getElementById('task');
+            tasks.forEach(task => {
+                const option = document.createElement('option');
+                option.value = task.id;
+                option.textContent = task.name;
+                taskDropdown.appendChild(option);
+            });
+        }
+
+        document.getElementById('working-department').addEventListener('change', async (event) => {
+            const departmentId = event.target.value;
+            const regions = await fetchRegions(departmentId);
+            const regionDropdown = document.getElementById('working-region');
+            regionDropdown.innerHTML = '';
+            regions.forEach(region => {
+                const option = document.createElement('option');
+                option.value = region.id;
+                option.textContent = region.name;
+                regionDropdown.appendChild(option);
+            });
+            regionDropdown.classList.remove('hidden');
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            populateDropdowns();
+        });
+
+        document.getElementById('productivity-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const agentName = document.getElementById('agent-name').value;
+            const workingDepartment = document.getElementById('working-department').value;
+            const workingRegion = document.getElementById('working-region').value;
+            const ticketNumber = document.getElementById('ticket-number').value;
+            const taskDate = document.getElementById('task-date').value;
+            const emailTime = document.getElementById('email-time').value;
+            const task = document.getElementById('task').value;
+            const timeTaken = document.getElementById('time-taken').value;
+            const taskDetails = document.getElementById('task-details').value;
+
+            const response = await supabase.from('productivity_data').insert([
+                {
+                    agent_name: agentName,
+                    working_department: workingDepartment,
+                    working_region: workingRegion,
+                    ticket_number: ticketNumber,
+                    task_date: taskDate,
+                    email_time: emailTime,
+                    task: task,
+                    time_taken: timeTaken,
+                    task_details: taskDetails
+                }
+            ]);
+
+            if (response.error) {
+                alert('Error submitting form: ' + response.error.message);
+            } else {
+                alert('Form submitted successfully');
+                document.getElementById('productivity-form').reset();
+            }
+        });
+    </script>
 </body>
 </html>
