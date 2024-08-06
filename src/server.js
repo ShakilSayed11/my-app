@@ -9,15 +9,12 @@ const cookieParser = require('cookie-parser');
 const app = express();
 const port = process.env.PORT || 10000;
 
-// Initialize Supabase client
-const supabase = createClient('https://dwcbvbpwkfmydeucsydj.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3Y2J2YnB3a2ZteWRldWNzeWRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjI4NTQ2NTMsImV4cCI6MjAzODQzMDY1M30.g688zmPnGmwu9oBt7YrfUmtivDohDyiEYPQP-lz16GI');
+const supabase = createClient('https://dwcbvbpwkfmydeucsydj.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3Y2J2YnB3a2ZteWRldWNzeWRqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyMjg1NDY1MywiZXhwIjoyMDM4NDMwNjUzfQ.51c7anMSPbGU6MGpzUbJZz9rhorFNOFOxUCizY62l7M');
 
-// Middleware
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '../public')));
 
-// Middleware for checking JWT and setting user role
 const authenticateJWT = (req, res, next) => {
     const token = req.cookies.token;
 
@@ -34,49 +31,51 @@ const authenticateJWT = (req, res, next) => {
     }
 };
 
-// Root route to serve the login page
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/login.html'));
 });
 
-// Login endpoint
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
     console.log(`Attempting to log in user: ${username}`);
 
-    const { data, error } = await supabase
-        .from('user_credentials')
-        .select('*')
-        .eq('username', username)
-        .single();
+    try {
+        const { data, error } = await supabase
+            .from('user_credentials')
+            .select('*')
+            .eq('username', username)
+            .single();
 
-    if (error) {
-        console.error('Error fetching user:', error);
-        return res.status(400).json({ error: 'Invalid username or password' });
+        if (error) {
+            console.error('Error fetching user:', error);
+            return res.status(400).json({ error: 'Invalid username or password' });
+        }
+
+        if (!data) {
+            console.error('No user found');
+            return res.status(400).json({ error: 'Invalid username or password' });
+        }
+
+        console.log('User fetched from database:', data);
+
+        const isMatch = await bcrypt.compare(password, data.password_hash);
+
+        console.log(`Password match: ${isMatch}`);
+
+        if (!isMatch) {
+            return res.status(400).json({ error: 'Invalid username or password' });
+        }
+
+        const token = jwt.sign({ username: data.username, role: data.roles[0] }, 'YOUR_JWT_SECRET', { expiresIn: '1h' });
+        res.cookie('token', token, { httpOnly: true });
+        res.json({ message: 'Login successful' });
+    } catch (err) {
+        console.error('Server error:', err);
+        res.status(500).json({ error: 'Server error' });
     }
-
-    if (!data) {
-        console.error('No user found');
-        return res.status(400).json({ error: 'Invalid username or password' });
-    }
-
-    console.log('User fetched from database:', data);
-
-    const isMatch = await bcrypt.compare(password, data.password_hash);
-
-    console.log(`Password match: ${isMatch}`);
-
-    if (!isMatch) {
-        return res.status(400).json({ error: 'Invalid username or password' });
-    }
-
-    const token = jwt.sign({ username: data.username, role: data.roles[0] }, 'f85b34d96a0cd74d487d04a036b27243', { expiresIn: '1h' });
-    res.cookie('token', token, { httpOnly: true });
-    res.json({ message: 'Login successful' });
 });
 
-// Add user endpoint
 app.post('/add-user', authenticateJWT, async (req, res) => {
     const { username, password } = req.body;
 
@@ -102,7 +101,6 @@ app.post('/add-user', authenticateJWT, async (req, res) => {
     }
 });
 
-// Dashboard route
 app.get('/dashboard', authenticateJWT, (req, res) => {
     const role = req.user.role;
 
@@ -115,18 +113,12 @@ app.get('/dashboard', authenticateJWT, (req, res) => {
     }
 });
 
-// Admin route
 app.get('/admin', authenticateJWT, (req, res) => {
     if (req.user.role === 'admin') {
         res.sendFile(path.join(__dirname, '../public/admin.html'));
     } else {
         res.status(403).send('Access denied');
     }
-});
-
-// Handle 404 errors
-app.use((req, res) => {
-    res.status(404).send('Page not found');
 });
 
 app.listen(port, () => {
