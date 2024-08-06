@@ -46,20 +46,20 @@ app.post('/login', async (req, res) => {
   console.log(`Login attempt with username: ${username}`);
 
   // Query Supabase to verify user credentials
-  const { data, error } = await supabase
-    .from('users')
-    .select('*')
-    .eq('username', username)
-    .single();
-
-  console.log('Supabase response:', { data, error });
-
-  if (error || !data) {
-    console.log('Invalid credentials - user not found');
-    return res.status(401).json({ message: 'Invalid credentials' });
-  }
-
   try {
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('username', username)
+      .single();
+
+    console.log('Supabase response:', { data, error });
+
+    if (error || !data) {
+      console.log('Invalid credentials - user not found');
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
     const match = await bcrypt.compare(password, data.password);
     console.log(`Password match: ${match}`);
 
@@ -76,7 +76,7 @@ app.post('/login', async (req, res) => {
     console.log('Login successful');
     res.redirect('/');
   } catch (err) {
-    console.error('Error during password comparison', err);
+    console.error('Error during login process', err);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
