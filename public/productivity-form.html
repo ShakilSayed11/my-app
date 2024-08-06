@@ -8,8 +8,20 @@
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 0;
             background-color: #f4f4f4;
+        }
+        .navbar {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            display: flex;
+            justify-content: space-around;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
         }
         .form-container {
             max-width: 800px;
@@ -18,6 +30,7 @@
             background: white;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin-top: 20px;
         }
         .form-group {
             margin-bottom: 15px;
@@ -58,6 +71,11 @@
     </style>
 </head>
 <body>
+    <div class="navbar">
+        <a href="/productivity-form">Productivity Form</a>
+        <a href="/report-outage">Report Outage</a>
+        <a href="/roster">Roster</a>
+    </div>
     <div class="form-container">
         <h1>Productivity Form</h1>
         <form id="productivity-form">
