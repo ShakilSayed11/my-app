@@ -50,7 +50,7 @@ app.post('/login', async (req, res) => {
         return res.status(400).json({ error: 'Invalid username or password' });
     }
 
-    const token = jwt.sign({ username: data.username, role: data.roles[0] }, 'your_jwt_secret', { expiresIn: '1h' });
+    const token = jwt.sign({ username: data.username, role: data.roles[0] }, 'f85b34d96a0cd74d487d04a036b27243', { expiresIn: '1h' });
     res.cookie('token', token, { httpOnly: true });
     res.json({ message: 'Login successful' });
 });
