@@ -1,4 +1,13 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.querySelector('#productivity-form');
+
+    // Initialize Supabase client
+    const { createClient } = supabase;
+    const supabaseUrl = 'https://your-project.supabase.co';
+    const supabaseKey = 'your-anon-key';
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Data for dropdowns
     const agents = [
         "Sahil Sanadi", "Nikhil Singh", "Junaid Qazi", "Irfan Qureshi", "Shruti Nambiar",
         "Amreen Shaikh", "Nasim Rahamathulla", "Megha Parit", "Bhushan Kisan", "Asra Peerzada",
@@ -51,12 +60,8 @@ document.addEventListener('DOMContentLoaded', function() {
         "Task assigned by TL / Manager", "Test Entry do not use it"
     ];
 
-    const agentSelect = document.getElementById('agent');
-    const departmentSelect = document.getElementById('department');
-    const regionSelect = document.getElementById('region');
-    const taskSelect = document.getElementById('task');
-
-    // Populate agents
+    // Fill agents dropdown
+    const agentSelect = document.querySelector('#agent-name');
     agents.forEach(agent => {
         const option = document.createElement('option');
         option.value = agent;
@@ -64,7 +69,17 @@ document.addEventListener('DOMContentLoaded', function() {
         agentSelect.appendChild(option);
     });
 
-    // Populate tasks
+    // Fill departments dropdown
+    const departmentSelect = document.querySelector('#department');
+    Object.keys(departments).forEach(department => {
+        const option = document.createElement('option');
+        option.value = department;
+        option.textContent = department;
+        departmentSelect.appendChild(option);
+    });
+
+    // Fill tasks dropdown
+    const taskSelect = document.querySelector('#task-name');
     tasks.forEach(task => {
         const option = document.createElement('option');
         option.value = task;
@@ -72,20 +87,90 @@ document.addEventListener('DOMContentLoaded', function() {
         taskSelect.appendChild(option);
     });
 
-    // Update regions based on department selection
-    departmentSelect.addEventListener('change', function() {
-        const selectedDepartment = departmentSelect.value;
-        const regions = departments[selectedDepartment] || [];
+    // Fill regions dropdown based on department selection
+    departmentSelect.addEventListener('change', function () {
+        const regionSelect = document.querySelector('#region');
+        const selectedDepartment = this.value;
 
-        // Clear existing options
-        regionSelect.innerHTML = '<option value="" disabled selected>Select Region</option>';
+        // Clear previous options
+        regionSelect.innerHTML = '<option value="" selected>Select</option>';
 
-        // Populate new options
-        regions.forEach(region => {
-            const option = document.createElement('option');
-            option.value = region;
-            option.textContent = region;
-            regionSelect.appendChild(option);
-        });
+        if (departments[selectedDepartment]) {
+            departments[selectedDepartment].forEach(region => {
+                const option = document.createElement('option');
+                option.value = region;
+                option.textContent = region;
+                regionSelect.appendChild(option);
+            });
+        }
+    });
+
+    // Set current date for Task Date field
+    const taskDateInput = document.querySelector('#task-date');
+    taskDateInput.value = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+    taskDateInput.setAttribute('readonly', true);
+
+    // Email Time input validation
+    const emailTimeInput = document.querySelector('#email-time');
+    emailTimeInput.addEventListener('input', function (e) {
+        const value = e.target.value;
+        if (!/^\d{2}:\d{2}$/.test(value)) {
+            e.target.value = value.slice(0, -1); // Remove last character if invalid
+        }
+    });
+
+    // Form submission handler
+    form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const agentName = document.querySelector('#agent-name').value;
+        const department = document.querySelector('#department').value;
+        const region = document.querySelector('#region').value;
+        const ticketNumber = document.querySelector('#ticket-number').value;
+        const taskDate = document.querySelector('#task-date').value;
+        const emailTime = document.querySelector('#email-time').value;
+        const taskName = document.querySelector('#task-name').value;
+        const taskTime = document.querySelector('#task-time').value;
+
+        // Validate all required fields
+        if (!agentName || !department || !region || !ticketNumber || !emailTime || !taskName || !taskTime) {
+            alert('Please fill out all required fields.');
+            return;
+        }
+
+        // Validate Ticket Number (must be 6 digits)
+        if (!/^\d{6}$/.test(ticketNumber)) {
+            alert('Ticket Number must be exactly 6 digits.');
+            return;
+        }
+
+        // Get current submission time
+        const submissionTime = new Date().toLocaleTimeString();
+
+        // Insert data into Supabase
+        const { data, error } = await supabase
+            .from('productivity-data')
+            .insert([
+                {
+                    'Agent Name': agentName,
+                    'Working Department': department,
+                    'Working Region': region,
+                    'Ticket Number': ticketNumber,
+                    'Task Date': taskDate,
+                    'Email Time': emailTime,
+                    'Task Name': taskName,
+                    'Task Time': taskTime,
+                    'Submission Time': submissionTime
+                }
+            ]);
+
+        if (error) {
+            console.error('Error inserting data:', error);
+            alert('Error submitting form. Please try again.');
+        } else {
+            alert('Form submitted successfully!');
+            form.reset();
+            document.querySelector('#region').innerHTML = '<option value="" selected>Select</option>'; // Reset regions dropdown
+        }
     });
 });
