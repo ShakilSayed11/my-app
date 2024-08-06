@@ -10,8 +10,8 @@ const bcrypt = require('bcrypt');
 const app = express();
 
 // Initialize Supabase with the correct URL and Anon Key
-const supabaseUrl = 'https://yourproject.supabase.co';
-const supabaseAnonKey = 'YOUR_SUPABASE_ANON_KEY';
+const supabaseUrl = 'https://dwcbvbpwkfmydeucsydj.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3Y2J2YnB3a2ZteWRldWNzeWRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjI4NTQ2NTMsImV4cCI6MjAzODQzMDY1M30.g688zmPnGmwu9oBt7YrfUmtivDohDyiEYPQP-lz16GI';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Middleware
