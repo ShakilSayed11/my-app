@@ -1,9 +1,11 @@
-document.addEventListener('DOMContentLoaded', function () {
-    // Initialize Supabase client with provided URL and key
-    const supabaseUrl = 'https://dwcbvbpwkfmydeucsydj.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3Y2J2YnB3a2ZteWRldWNzeWRqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyMjg1NDY1MywiZXhwIjoyMDM4NDMwNjUzfQ.51c7anMSPbGU6MGpzUbJZz9rhorFNOFOxUCizY62l7M'; // Replace with your actual key
-    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+import { createClient } from '@supabase/supabase-js';
 
+// Initialize Supabase client with provided URL and key
+const supabaseUrl = 'https://dwcbvbpwkfmydeucsydj.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3Y2J2YnB3a2ZteWRldWNzeWRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjI4NTQ2NTMsImV4cCI6MjAzODQzMDY1M30.g688zmPnGmwu9oBt7YrfUmtivDohDyiEYPQP-lz16GI'; // Ensure this is set correctly
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+document.addEventListener('DOMContentLoaded', () => {
     const form = document.querySelector('#productivity-form');
 
     // Data for dropdowns
