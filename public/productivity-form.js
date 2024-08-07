@@ -1,9 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize Supabase client inside the event listener with the updated key
-    const supabase = supabase.createClient(
-        'https://dwcbvbpwkfmydeucsydj.supabase.co',
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3Y2J2YnB3a2ZteWRldWNzeWRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjI4NTQ2NTMsImV4cCI6MjAzODQzMDY1M30.g688zmPnGmwu9oBt7YrfUmtivDohDyiEYPQP-lz16GI'
-    );
+    // Access the global Supabase client
+    const supabase = window.supabase;
 
     const form = document.querySelector('#productivity-form');
     if (!form) {
@@ -64,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
         "Task assigned by TL / Manager", "Test Entry do not use it"
     ];
 
-    // Populate agent names dropdown
+     // Populate agent names dropdown
     const agentNameSelect = document.querySelector('#agent-name');
     agents.forEach(agent => {
         const option = document.createElement('option');
