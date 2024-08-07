@@ -6,39 +6,50 @@
     <title>Productivity Form</title>
 </head>
 <body>
-    <h1>Productivity Form</h1>
     <form id="productivity-form">
-        <label for="agent-name">Agent Name:</label>
-        <input type="text" id="agent-name" name="agent-name" required><br><br>
+        <label for="agent">Agent Name:</label>
+        <select id="agent" name="agent" required>
+            <option value="">Select</option>
+        </select>
+        <br>
 
-        <label for="department">Working Department:</label>
+        <label for="department">Department:</label>
         <select id="department" name="department" required>
-            <option value="" selected>Select</option>
-        </select><br><br>
+            <option value="">Select</option>
+        </select>
+        <br>
 
-        <label for="region">Working Region:</label>
+        <label for="region">Region:</label>
         <select id="region" name="region" required>
-            <option value="" selected>Select</option>
-        </select><br><br>
+            <option value="">Select</option>
+        </select>
+        <br>
 
         <label for="ticket-number">Ticket Number:</label>
-        <input type="number" id="ticket-number" name="ticket-number" min="100000" max="999999" required><br><br>
+        <input type="text" id="ticket-number" name="ticket-number" required pattern="\d{6}">
+        <br>
 
         <label for="task-date">Task Date:</label>
-        <input type="date" id="task-date" name="task-date" required><br><br>
+        <input type="date" id="task-date" name="task-date" required readonly>
+        <br>
 
         <label for="email-time">Email Time:</label>
-        <input type="text" id="email-time" name="email-time" placeholder="hh:mm" required pattern="\d{2}:\d{2}"><br><br>
+        <input type="time" id="email-time" name="email-time" required>
+        <br>
 
-        <label for="task-name">Task Name:</label>
-        <input type="text" id="task-name" name="task-name" required><br><br>
+        <label for="task">Task Name:</label>
+        <select id="task" name="task" required>
+            <option value="">Select</option>
+        </select>
+        <br>
 
         <label for="task-time">Task Time:</label>
-        <input type="text" id="task-time" name="task-time" placeholder="hh:mm" required pattern="\d{2}:\d{2}"><br><br>
+        <input type="time" id="task-time" name="task-time" required>
+        <br>
 
-        <input type="submit" value="Submit">
+        <button type="submit">Submit</button>
     </form>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-    <script src="productivity-form.js"></script>
+
+    <script type="module" src="productivity-form.js"></script>
 </body>
 </html>
