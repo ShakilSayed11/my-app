@@ -1,5 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.querySelector('#productivity-form');
+    if (!form) {
+        console.error('Form element not found');
+        return;
+    }
 
     // Data for dropdowns
     const agents = [
@@ -56,62 +60,88 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Fill agents dropdown
     const agentSelect = document.querySelector('#agent-name');
-    agents.forEach(agent => {
-        const option = document.createElement('option');
-        option.value = agent;
-        option.textContent = agent;
-        agentSelect.appendChild(option);
-    });
+    if (agentSelect) {
+        agents.forEach(agent => {
+            const option = document.createElement('option');
+            option.value = agent;
+            option.textContent = agent;
+            agentSelect.appendChild(option);
+        });
+    } else {
+        console.error('Agent select element not found');
+    }
 
     // Fill departments dropdown
     const departmentSelect = document.querySelector('#department');
-    Object.keys(departments).forEach(department => {
-        const option = document.createElement('option');
-        option.value = department;
-        option.textContent = department;
-        departmentSelect.appendChild(option);
-    });
+    if (departmentSelect) {
+        Object.keys(departments).forEach(department => {
+            const option = document.createElement('option');
+            option.value = department;
+            option.textContent = department;
+            departmentSelect.appendChild(option);
+        });
+    } else {
+        console.error('Department select element not found');
+    }
 
     // Fill tasks dropdown
     const taskSelect = document.querySelector('#task-name');
-    tasks.forEach(task => {
-        const option = document.createElement('option');
-        option.value = task;
-        option.textContent = task;
-        taskSelect.appendChild(option);
-    });
+    if (taskSelect) {
+        tasks.forEach(task => {
+            const option = document.createElement('option');
+            option.value = task;
+            option.textContent = task;
+            taskSelect.appendChild(option);
+        });
+    } else {
+        console.error('Task select element not found');
+    }
 
     // Fill regions dropdown based on department selection
-    departmentSelect.addEventListener('change', function () {
-        const regionSelect = document.querySelector('#region');
-        const selectedDepartment = this.value;
+    if (departmentSelect) {
+        departmentSelect.addEventListener('change', function () {
+            const regionSelect = document.querySelector('#region');
+            const selectedDepartment = this.value;
 
-        // Clear previous options
-        regionSelect.innerHTML = '<option value="" selected>Select</option>';
+            if (regionSelect) {
+                // Clear previous options
+                regionSelect.innerHTML = '<option value="" selected>Select</option>';
 
-        if (departments[selectedDepartment]) {
-            departments[selectedDepartment].forEach(region => {
-                const option = document.createElement('option');
-                option.value = region;
-                option.textContent = region;
-                regionSelect.appendChild(option);
-            });
-        }
-    });
+                if (departments[selectedDepartment]) {
+                    departments[selectedDepartment].forEach(region => {
+                        const option = document.createElement('option');
+                        option.value = region;
+                        option.textContent = region;
+                        regionSelect.appendChild(option);
+                    });
+                }
+            } else {
+                console.error('Region select element not found');
+            }
+        });
+    }
 
     // Set current date for Task Date field
     const taskDateInput = document.querySelector('#task-date');
-    taskDateInput.value = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
-    taskDateInput.setAttribute('readonly', true);
+    if (taskDateInput) {
+        taskDateInput.value = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+        taskDateInput.setAttribute('readonly', true);
+    } else {
+        console.error('Task date input element not found');
+    }
 
     // Email Time input validation
     const emailTimeInput = document.querySelector('#email-time');
-    emailTimeInput.addEventListener('input', function (e) {
-        const value = e.target.value;
-        if (!/^\d{2}:\d{2}$/.test(value)) {
-            e.target.value = value.slice(0, -1); // Remove last character if invalid
-        }
-    });
+    if (emailTimeInput) {
+        emailTimeInput.addEventListener('input', function (e) {
+            const value = e.target.value;
+            if (!/^\d{2}:\d{2}$/.test(value)) {
+                e.target.value = value.slice(0, -1); // Remove last character if invalid
+            }
+        });
+    } else {
+        console.error('Email time input element not found');
+    }
 
     // Form submission handler
     form.addEventListener('submit', async function (e) {
@@ -141,30 +171,35 @@ document.addEventListener('DOMContentLoaded', () => {
         // Get current submission time
         const submissionTime = new Date().toLocaleTimeString();
 
-        // Insert data into Supabase
-        const { data, error } = await supabase
-            .from('productivity-data')
-            .insert([
-                {
-                    'Agent Name': agentName,
-                    'Working Department': department,
-                    'Working Region': region,
-                    'Ticket Number': ticketNumber,
-                    'Task Date': taskDate,
-                    'Email Time': emailTime,
-                    'Task Name': taskName,
-                    'Task Time': taskTime,
-                    'Submission Time': submissionTime
-                }
-            ]);
+        try {
+            // Insert data into Supabase
+            const { data, error } = await supabase
+                .from('productivity-data')
+                .insert([
+                    {
+                        'Agent Name': agentName,
+                        'Working Department': department,
+                        'Working Region': region,
+                        'Ticket Number': ticketNumber,
+                        'Task Date': taskDate,
+                        'Email Time': emailTime,
+                        'Task Name': taskName,
+                        'Task Time': taskTime,
+                        'Submission Time': submissionTime
+                    }
+                ]);
 
-        if (error) {
-            console.error('Error inserting data:', error);
+            if (error) {
+                console.error('Error inserting data:', error);
+                alert('Error submitting form. Please try again.');
+            } else {
+                alert('Form submitted successfully!');
+                form.reset();
+                document.querySelector('#region').innerHTML = '<option value="" selected>Select</option>'; // Reset regions dropdown
+            }
+        } catch (err) {
+            console.error('Error submitting form:', err);
             alert('Error submitting form. Please try again.');
-        } else {
-            alert('Form submitted successfully!');
-            form.reset();
-            document.querySelector('#region').innerHTML = '<option value="" selected>Select</option>'; // Reset regions dropdown
         }
     });
 });
