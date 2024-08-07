@@ -64,100 +64,24 @@ document.addEventListener('DOMContentLoaded', () => {
         "Task assigned by TL / Manager", "Test Entry do not use it"
     ];
 
-    // Fill agents dropdown
-    const agentSelect = document.querySelector('#agent-name');
-    if (agentSelect) {
-        agents.forEach(agent => {
-            const option = document.createElement('option');
-            option.value = agent;
-            option.textContent = agent;
-            agentSelect.appendChild(option);
-        });
-    } else {
-        console.error('Agent select element not found');
-    }
+    // Populate agent names dropdown
+    const agentNameSelect = document.querySelector('#agent-name');
+    agents.forEach(agent => {
+        const option = document.createElement('option');
+        option.value = agent;
+        option.textContent = agent;
+        agentNameSelect.appendChild(option);
+    });
 
-    // Fill departments dropdown
-    const departmentSelect = document.querySelector('#department');
-    if (departmentSelect) {
-        Object.keys(departments).forEach(department => {
-            const option = document.createElement('option');
-            option.value = department;
-            option.textContent = department;
-            departmentSelect.appendChild(option);
-        });
-    } else {
-        console.error('Department select element not found');
-    }
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
 
-    // Fill tasks dropdown
-    const taskSelect = document.querySelector('#task-name');
-    if (taskSelect) {
-        tasks.forEach(task => {
-            const option = document.createElement('option');
-            option.value = task;
-            option.textContent = task;
-            taskSelect.appendChild(option);
-        });
-    } else {
-        console.error('Task select element not found');
-    }
-
-    // Fill regions dropdown based on department selection
-    if (departmentSelect) {
-        departmentSelect.addEventListener('change', function () {
-            const regionSelect = document.querySelector('#region');
-            const selectedDepartment = this.value;
-
-            if (regionSelect) {
-                // Clear previous options
-                regionSelect.innerHTML = '<option value="" selected>Select</option>';
-
-                if (departments[selectedDepartment]) {
-                    departments[selectedDepartment].forEach(region => {
-                        const option = document.createElement('option');
-                        option.value = region;
-                        option.textContent = region;
-                        regionSelect.appendChild(option);
-                    });
-                }
-            } else {
-                console.error('Region select element not found');
-            }
-        });
-    }
-
-    // Set current date for Task Date field
-    const taskDateInput = document.querySelector('#task-date');
-    if (taskDateInput) {
-        taskDateInput.value = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
-        taskDateInput.setAttribute('readonly', true);
-    } else {
-        console.error('Task date input element not found');
-    }
-
-    // Email Time input validation
-    const emailTimeInput = document.querySelector('#email-time');
-    if (emailTimeInput) {
-        emailTimeInput.addEventListener('input', function (e) {
-            const value = e.target.value;
-            if (!/^\d{2}:\d{2}$/.test(value)) {
-                e.target.value = value.slice(0, -1); // Remove last character if invalid
-            }
-        });
-    } else {
-        console.error('Email time input element not found');
-    }
-
-    // Form submission handler
-    form.addEventListener('submit', async function (e) {
-        e.preventDefault();
-
+        // Get form values
         const agentName = document.querySelector('#agent-name').value;
         const department = document.querySelector('#department').value;
         const region = document.querySelector('#region').value;
         const ticketNumber = document.querySelector('#ticket-number').value;
-        const taskDate = document.querySelector('#task-date').value;
+        const taskDate = new Date().toLocaleDateString(); // Assuming taskDate is current date
         const emailTime = document.querySelector('#email-time').value;
         const taskName = document.querySelector('#task-name').value;
         const taskTime = document.querySelector('#task-time').value;
