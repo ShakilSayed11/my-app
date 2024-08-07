@@ -1,4 +1,4 @@
-import { createClient } from './node_modules/@supabase/supabase-js/dist/main/index.js';
+import { createClient } from '@supabase/supabase-js';
 
 // Initialize Supabase client with provided URL and key
 const supabaseUrl = 'https://dwcbvbpwkfmydeucsydj.supabase.co';
