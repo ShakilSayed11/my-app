@@ -1,12 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Access the global Supabase client
-    const supabase = window.supabase;
-
     const form = document.querySelector('#productivity-form');
     if (!form) {
         console.error('Form element not found');
         return;
     }
+
+    // Initialize Supabase client
+    const supabase = window.supabase.createClient(
+        'https://dwcbvbpwkfmydeucsydj.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3Y2J2YnB3a2ZteWRldWNzeWRqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyMjg1NDY1MywiZXhwIjoyMDM4NDMwNjUzfQ.51c7anMSPbGU6MGpzUbJZz9rhorFNOFOxUCizY62l7M'
+    );
 
     // Data for dropdowns
     const agents = [
@@ -61,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
         "Task assigned by TL / Manager", "Test Entry do not use it"
     ];
 
-     // Populate agent names dropdown
+    // Populate agent names dropdown
     const agentNameSelect = document.querySelector('#agent-name');
     agents.forEach(agent => {
         const option = document.createElement('option');
