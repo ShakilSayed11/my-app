@@ -1,4 +1,7 @@
-import { createClient } from '@supabase/supabase-js';
+// Ensure this file uses ES module syntax
+import { someFunction } from './someModule.js';
+
+someFunction();
 
 // Initialize Supabase client with provided URL and key
 const supabaseUrl = 'https://dwcbvbpwkfmydeucsydj.supabase.co';
