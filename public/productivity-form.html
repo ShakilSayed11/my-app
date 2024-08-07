@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Productivity Form</title>
+    <!-- Load Supabase script first -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.0.0/dist/supabase.min.js"></script>
+    <!-- Load custom script after Supabase -->
     <script defer src="productivity-form.js"></script>
 </head>
 <body>
@@ -12,7 +14,7 @@
     <form id="productivity-form">
         <label for="agent-name">Agent Name:</label>
         <input type="text" id="agent-name" name="agent-name" required>
-        
+
         <label for="department">Department:</label>
         <select id="department" name="department" required>
             <option value="" selected>Select</option>
@@ -26,10 +28,7 @@
         </select>
 
         <label for="ticket-number">Ticket Number:</label>
-        <input type="text" id="ticket-number" name="ticket-number" required pattern="\d{6}" title="Ticket Number must be exactly 6 digits">
-
-        <label for="task-date">Task Date:</label>
-        <input type="date" id="task-date" name="task-date" required>
+        <input type="text" id="ticket-number" name="ticket-number" required>
 
         <label for="email-time">Email Time:</label>
         <input type="time" id="email-time" name="email-time" required>
