@@ -1,8 +1,15 @@
+// Initialize Supabase client
+const supabase = supabase.createClient(
+    'https://dwcbvbpwkfmydeucsydj.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3Y2J2YnB3a2ZteWRldWNzeWRqIiwicm9zZSI6ImFub24iLCJpYXQiOjE3MjI4NTQ2NTMsImV4cCI6MjAzODQzMDY1M30.g688zmPnGmwu9oBt7YrfUmtivDohDyiEYPQP-lz16GI'
+);
+
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.querySelector('#productivity-form');
-
-    // Initialize Supabase client
-    const supabase = createClient('https://dwcbvbpwkfmydeucsydj.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3Y2J2YnB3a2ZteWRldWNzeWRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjI4NTQ2NTMsImV4cCI6MjAzODQzMDY1M30.g688zmPnGmwu9oBt7YrfUmtivDohDyiEYPQP-lz16GI');
+    if (!form) {
+        console.error('Form element not found');
+        return;
+    }
 
     // Data for dropdowns
     const agents = [
@@ -146,34 +153,17 @@ document.addEventListener('DOMContentLoaded', () => {
     form.addEventListener('submit', async function (e) {
         e.preventDefault();
 
-        // Get form fields
-        const agentNameEl = document.querySelector('#agent-name');
-        const departmentEl = document.querySelector('#department');
-        const regionEl = document.querySelector('#region');
-        const ticketNumberEl = document.querySelector('#ticket-number');
-        const taskDateEl = document.querySelector('#task-date');
-        const emailTimeEl = document.querySelector('#email-time');
-        const taskNameEl = document.querySelector('#task-name');
-        const taskTimeEl = document.querySelector('#task-time');
-
-        // Check if elements exist
-        if (!agentNameEl || !departmentEl || !regionEl || !ticketNumberEl || !taskDateEl || !emailTimeEl || !taskNameEl || !taskTimeEl) {
-            console.error('One or more form elements are missing.');
-            alert('Form elements are missing. Please check the HTML.');
-            return;
-        }
-
-        const agentName = agentNameEl.value;
-        const department = departmentEl.value;
-        const region = regionEl.value;
-        const ticketNumber = ticketNumberEl.value;
-        const taskDate = taskDateEl.value;
-        const emailTime = emailTimeEl.value;
-        const taskName = taskNameEl.value;
-        const taskTime = taskTimeEl.value;
+        const agentName = document.querySelector('#agent-name').value;
+        const department = document.querySelector('#department').value;
+        const region = document.querySelector('#region').value;
+        const ticketNumber = document.querySelector('#ticket-number').value;
+        const taskDate = document.querySelector('#task-date').value;
+        const emailTime = document.querySelector('#email-time').value;
+        const taskName = document.querySelector('#task-name').value;
+        const taskTime = document.querySelector('#task-time').value;
 
         // Validate all required fields
-        if (!agentName || !department || !region || !ticketNumber || !taskDate || !emailTime || !taskName || !taskTime) {
+        if (!agentName || !department || !region || !ticketNumber || !emailTime || !taskName || !taskTime) {
             alert('Please fill out all required fields.');
             return;
         }
@@ -187,30 +177,35 @@ document.addEventListener('DOMContentLoaded', () => {
         // Get current submission time
         const submissionTime = new Date().toLocaleTimeString();
 
-        // Insert data into Supabase
-        const { data, error } = await supabase
-            .from('productivity-data')
-            .insert([
-                {
-                    'Agent Name': agentName,
-                    'Working Department': department,
-                    'Working Region': region,
-                    'Ticket Number': ticketNumber,
-                    'Task Date': taskDate,
-                    'Email Time': emailTime,
-                    'Task Name': taskName,
-                    'Task Time': taskTime,
-                    'Submission Time': submissionTime
-                }
-            ]);
+        try {
+            // Insert data into Supabase
+            const { data, error } = await supabase
+                .from('productivity-data')
+                .insert([
+                    {
+                        'Agent Name': agentName,
+                        'Working Department': department,
+                        'Working Region': region,
+                        'Ticket Number': ticketNumber,
+                        'Task Date': taskDate,
+                        'Email Time': emailTime,
+                        'Task Name': taskName,
+                        'Task Time': taskTime,
+                        'Submission Time': submissionTime
+                    }
+                ]);
 
-        if (error) {
-            console.error('Error inserting data:', error);
+            if (error) {
+                console.error('Error inserting data:', error);
+                alert('Error submitting form. Please try again.');
+            } else {
+                alert('Form submitted successfully!');
+                form.reset();
+                document.querySelector('#region').innerHTML = '<option value="" selected>Select</option>'; // Reset regions dropdown
+            }
+        } catch (err) {
+            console.error('Error submitting form:', err);
             alert('Error submitting form. Please try again.');
-        } else {
-            alert('Form submitted successfully!');
-            form.reset();
-            document.querySelector('#region').innerHTML = '<option value="" selected>Select</option>'; // Reset regions dropdown
         }
     });
 });
