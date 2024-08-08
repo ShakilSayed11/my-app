@@ -133,4 +133,60 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Error submitting form. Please try again.');
         }
     });
+});    // Populate agents dropdown
+    const agentNameDropdown = document.getElementById('agent-name');
+    agents.forEach(agent => {
+        const option = document.createElement('option');
+        option.value = agent;
+        option.textContent = agent;
+        agentNameDropdown.appendChild(option);
+    });
+
+    // Handle department selection change
+    const departmentDropdown = document.getElementById('department');
+    const regionDropdown = document.getElementById('region');
+
+    departmentDropdown.addEventListener('change', () => {
+        const selectedDepartment = departmentDropdown.value;
+        const regions = departments[selectedDepartment] || [];
+
+        // Clear the current options in the region dropdown
+        regionDropdown.innerHTML = '<option value="" selected>Select</option>';
+
+        // Populate the region dropdown with the relevant options
+        regions.forEach(region => {
+            const option = document.createElement('option');
+            option.value = region;
+            option.textContent = region;
+            regionDropdown.appendChild(option);
+        });
+    });
+
+    // Handle form submission
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const formData = new FormData(form);
+        const data = {
+            agent_name: formData.get('agent-name'),
+            department: formData.get('department'),
+            region: formData.get('region'),
+            ticket_number: formData.get('ticket-number'),
+            email_time: formData.get('email-time'),
+            task_name: formData.get('task-name'),
+            task_time: formData.get('task-time'),
+            submission_time: new Date().toISOString()
+        };
+
+        const { error } = await supabase
+            .from('productivity-data')
+            .insert([data]);
+
+        if (error) {
+            console.error('Error inserting data:', error);
+        } else {
+            console.log('Data inserted successfully');
+            form.reset();
+        }
+    });
 });
