@@ -4,15 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Productivity Form</title>
-    <!-- Load Supabase script first -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.0.0/dist/supabase.min.js"></script>
-    <script>
-        // Ensure Supabase client is initialized in global scope
-        window.supabase = supabase.createClient(
-            'https://dwcbvbpwkfmydeucsydj.supabase.co',
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3Y2J2YnB3a2ZteWRldWNzeWRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjI4NTQ2NTMsImV4cCI6MjAzODQzMDY1M30.g688zmPnGmwu9oBt7YrfUmtivDohDyiEYPQP-lz16GI'
-        );
-    </script>
 </head>
 <body>
     <h1>Productivity Form</h1>
@@ -46,8 +37,7 @@
 
         <button type="submit">Submit</button>
     </form>
-
-    <!-- Load custom script after Supabase -->
-    <script src="productivity-form.js"></script>
 </body>
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="productivity-form.js"></script>
 </html>
