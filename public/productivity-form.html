@@ -9,7 +9,9 @@
     <h1>Productivity Form</h1>
     <form id="productivity-form">
         <label for="agent-name">Agent Name:</label>
-        <input type="text" id="agent-name" name="agent-name" required>
+        <select id="agent-name" name="agent-name" required>
+            <option value="" selected>Select</option>
+        </select>
 
         <label for="department">Department:</label>
         <select id="department" name="department" required>
@@ -26,18 +28,23 @@
         <label for="ticket-number">Ticket Number:</label>
         <input type="text" id="ticket-number" name="ticket-number" required>
 
+        <label for="task-date">Task Date:</label>
+        <input type="date" id="task-date" name="task-date" required>
+
         <label for="email-time">Email Time:</label>
         <input type="time" id="email-time" name="email-time" required>
 
         <label for="task-name">Task Name:</label>
-        <input type="text" id="task-name" name="task-name" required>
+        <select id="task-name" name="task-name" required>
+            <option value="" selected>Select</option>
+        </select>
 
         <label for="task-time">Task Time:</label>
         <input type="time" id="task-time" name="task-time" required>
 
         <button type="submit">Submit</button>
     </form>
-</body>
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script src="productivity-form.js"></script>
+</body>
 </html>
