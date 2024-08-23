@@ -24,5 +24,6 @@ jobs:
         pip install -r backend/requirements.txt
 
     - name: Deploy to Vercel
+      env:
+        VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       run: npx vercel --prod --token ${{ secrets.VERCEL_TOKEN }} --cwd backend
-
