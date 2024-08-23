@@ -3,6 +3,6 @@
   publish = "public"
 
 [build.environment]
-  API_KEY = "your_api_key_here"
-  SHEET_ID = "your_sheet_id_here"
+  API_KEY = "AIzaSyBetGkBUBGg8vqxEYAnwm0FMXUCrole-xs"
+  SHEET_ID = "1QqxjcZj8YZWHNri6quC3Cu3uUo9pWrlP9P73k3oKUAM"
 
