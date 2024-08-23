@@ -1,1 +1,20 @@
+name: Deploy
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Inject secrets into script.js
+      run: |
+        sed -i 's/GITHUB_API_KEY/${{ secrets.API_KEY }}/g' script.js
+        sed -i 's/GITHUB_SHEET_ID/${{ secrets.SHEET_ID }}/g' script.js
+
+    - name: Deploy (optional)
+      run: echo "Deployment steps here" # Customize deployment as needed
 
