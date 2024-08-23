@@ -7,8 +7,8 @@ document.getElementById('data-form').addEventListener('submit', async function (
     const department = document.getElementById('department').value;
     const region = document.getElementById('region').value;
 
-    const apiKey = GITHUB_API_KEY; // Replace during deployment
-    const sheetId = GITHUB_SHEET_ID; // Replace during deployment
+    const apiKey = API_KEY; // Replace during deployment
+    const sheetId = SHEET_ID; // Replace during deployment
 
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Sheet1!A1:I?key=${apiKey}`;
     const response = await fetch(url);
@@ -30,4 +30,3 @@ document.getElementById('data-form').addEventListener('submit', async function (
     XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
     XLSX.writeFile(workbook, 'FilteredData.xlsx');
 });
-
