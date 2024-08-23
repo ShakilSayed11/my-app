@@ -1,1 +1,8 @@
+[build]
+  functions = "netlify/functions"
+  publish = "public"
+
+[build.environment]
+  API_KEY = "your_api_key_here"
+  SHEET_ID = "your_sheet_id_here"
 
