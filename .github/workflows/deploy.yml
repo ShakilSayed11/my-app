@@ -10,10 +10,9 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Inject secrets into script.js
+    - name: Inject environment variables into config.json
       run: |
-        sed -i 's/API_KEY/${{ secrets.GITHUB_API_KEY }}/g' script.js
-        sed -i 's/SHEET_ID/${{ secrets.GITHUB_SHEET_ID }}/g' script.js
+        echo "{ \"API_KEY\": \"${{ secrets.API_KEY }}\", \"SHEET_ID\": \"${{ secrets.SHEET_ID }}\" }" > config.json
 
     - name: Deploy (optional)
       run: echo "Deployment steps here" # Customize deployment as needed
