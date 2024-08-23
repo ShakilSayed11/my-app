@@ -7,6 +7,14 @@ exports.handler = async function(event, context) {
 
     try {
         const response = await fetch(url);
+        if (!response.ok) {
+            // Handle errors by returning the response text
+            const errorText = await response.text();
+            return {
+                statusCode: response.status,
+                body: JSON.stringify({ error: errorText }),
+            };
+        }
         const data = await response.json();
         return {
             statusCode: 200,
@@ -19,4 +27,3 @@ exports.handler = async function(event, context) {
         };
     }
 };
-
