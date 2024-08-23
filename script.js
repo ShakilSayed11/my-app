@@ -7,8 +7,9 @@ document.getElementById('data-form').addEventListener('submit', async function (
     const department = document.getElementById('department').value;
     const region = document.getElementById('region').value;
 
-    const apiKey = API_KEY; // Replace during deployment
-    const sheetId = SHEET_ID; // Replace during deployment
+    // Placeholders to be replaced by GitHub Actions
+    const apiKey = 'API_KEY';
+    const sheetId = 'SHEET_ID';
 
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Sheet1!A1:I?key=${apiKey}`;
     const response = await fetch(url);
